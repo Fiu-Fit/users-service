@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 export const UserRoles = {
   Admin:   'admin',
   Trainer: 'trainer',
-  Athlete: 'Athlete'
+  Athlete: 'athlete'
 };
 
 export class UserDto {

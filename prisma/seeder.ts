@@ -12,7 +12,7 @@ async function main() {
           lastName:  'Shih',
           email:     'ishih@fi.uba.ar',
           password:
-            '$2b$10$wXMtruMCWd2g3AXOrhG91uhDKFxpEo6rWj.n0C8r/HrvHq5WDGWea',
+            '$2b$10$RE5erES6xyuBiI92pxrAhuaSvmygFBJ3zNEtH9ylLrLyqhOSW36Cq',
           role: UserRoles.Admin
         },
         {
@@ -20,7 +20,7 @@ async function main() {
           lastName:  'Sanchez Fernandez de la Vega',
           email:     'msanchezf@fi.uba.ar',
           password:
-            '$2b$10$wXMtruMCWd2g3AXOrhG91uhDKFxpEo6rWj.n0C8r/HrvHq5WDGWea',
+            '$2b$10$RE5erES6xyuBiI92pxrAhuaSvmygFBJ3zNEtH9ylLrLyqhOSW36Cq',
           role: UserRoles.Athlete
         },
         {
@@ -28,7 +28,7 @@ async function main() {
           lastName:  'Platini',
           email:     'rplatinif@fi.uba.ar',
           password:
-            '$2b$10$wXMtruMCWd2g3AXOrhG91uhDKFxpEo6rWj.n0C8r/HrvHq5WDGWea',
+            '$2b$10$RE5erES6xyuBiI92pxrAhuaSvmygFBJ3zNEtH9ylLrLyqhOSW36Cq',
           role: UserRoles.Trainer
         }
       ]

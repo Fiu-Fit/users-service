@@ -35,6 +35,10 @@ yarn migrate reset
 
 Para levantar el proyecto
 
+### `yarn start --watch`
+
+Para levantar el proyecto en modo watch (si haces cambios en el codigo se reinicia el proyecto)
+
 ### `yarn migrate`
 
 Nos va a decir todas las utilidades que podemos hacer con las migraciones de Prisma.
