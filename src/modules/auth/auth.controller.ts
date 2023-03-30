@@ -1,6 +1,7 @@
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { Request } from 'express';
+import { UserDto } from '../user/user.dto';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth-guard';
 
@@ -9,7 +10,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
-  signUpUser(@Body() user: User): Promise<{ token: string }> {
+  signUpUser(@Body() user: UserDto): Promise<{ token: string }> {
     return this.authService.signUpUser(user);
   }
 

@@ -1,13 +1,17 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
   ParseIntPipe,
-  UseGuards,
+  Patch, Put,
+  UseGuards
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth-guard';
+import { UserDto } from './user.dto';
 import { UserService } from './user.service';
 
 @UseGuards(JwtAuthGuard)
@@ -29,5 +33,26 @@ export class UserController {
   @Get()
   getUsers(): Promise<User[]> {
     return this.userService.getUsers();
+  }
+
+  @Patch(':id')
+  editUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() user: Partial<UserDto>
+  ): Promise<User> {
+    return this.userService.editUser(id, user);
+  }
+
+  @Put(':id')
+  putEditUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() user: UserDto
+  ): Promise<User> {
+    return this.userService.editUser(id, user);
+  }
+
+  @Delete(':id')
+  deleteUser(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    return this.userService.deleteUser(id);
   }
 }

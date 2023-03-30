@@ -1,11 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
-import { compare, hashSync } from 'bcrypt';
+import { compare, genSaltSync, hashSync } from 'bcrypt';
 import { PrismaService } from '../../prisma.service';
+import { UserDto, UserRoles } from '../user/user.dto';
 import { UserService } from '../user/user.service';
-import { UserRoles } from '../user/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -15,24 +14,24 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async validateNewUser(user: User): Promise<void> {
+  async validateNewUser(user: UserDto): Promise<void> {
     if (await this.userService.getUserByEmail(user.email)) {
       throw new BadRequestException({
-        message: 'Email esta en uso'
+        message: 'Email esta en uso',
       });
     }
 
     if (!Object.values(UserRoles).includes(user.role)) {
       throw new BadRequestException({
-        message: 'Rol no valido'
+        message: 'Rol no valido',
       });
     }
   }
 
-  async signUpUser(user: User): Promise<{ token: string }> {
+  async signUpUser(user: UserDto): Promise<{ token: string }> {
     await this.validateNewUser(user);
 
-    const salt = bcrypt.genSaltSync(Number(process.env.SALT_ROUNDS));
+    const salt = genSaltSync(Number(process.env.SALT_ROUNDS));
     user.password = hashSync(user.password, salt);
 
     const createdUser = await this.prismaService.user.create({ data: user });
@@ -47,11 +46,11 @@ export class AuthService {
   createToken(user: User): { token: string } {
     const payload = {
       email: user.email,
-      sub:   user.id
+      sub:   user.id,
     };
 
     return {
-      token: this.jwtService.sign(payload)
+      token: this.jwtService.sign(payload),
     };
   }
 
