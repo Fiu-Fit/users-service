@@ -1,10 +1,5 @@
+import { Role } from '@prisma/client';
 import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
-
-export const UserRoles = {
-  Admin:   'admin',
-  Trainer: 'trainer',
-  Athlete: 'athlete'
-};
 
 export class UserDto {
   @IsEmail()
@@ -30,5 +25,5 @@ export class UserDto {
 
   @IsString()
   @IsNotEmpty()
-  role: string;
+  role: Role;
 }

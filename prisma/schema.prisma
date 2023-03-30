@@ -16,5 +16,11 @@ model User {
   firstName String @map("first_name")
   lastName  String @map("last_name")
   password  String
-  role      String
+  role      Role
+}
+
+enum Role {
+  Athlete
+  Trainer
+  Admin
 }

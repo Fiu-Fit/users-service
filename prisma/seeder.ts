@@ -1,5 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-import { UserRoles } from '../src/modules/user/user.dto';
+import { PrismaClient, Role } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -13,7 +12,7 @@ async function main() {
           email:     'ishih@fi.uba.ar',
           password:
             '$2b$10$RE5erES6xyuBiI92pxrAhuaSvmygFBJ3zNEtH9ylLrLyqhOSW36Cq',
-          role: UserRoles.Admin
+          role: Role.Admin
         },
         {
           firstName: 'Manuel',
@@ -21,7 +20,7 @@ async function main() {
           email:     'msanchezf@fi.uba.ar',
           password:
             '$2b$10$RE5erES6xyuBiI92pxrAhuaSvmygFBJ3zNEtH9ylLrLyqhOSW36Cq',
-          role: UserRoles.Athlete
+          role: Role.Athlete
         },
         {
           firstName: 'Rocio',
@@ -29,7 +28,7 @@ async function main() {
           email:     'rplatinif@fi.uba.ar',
           password:
             '$2b$10$RE5erES6xyuBiI92pxrAhuaSvmygFBJ3zNEtH9ylLrLyqhOSW36Cq',
-          role: UserRoles.Trainer
+          role: Role.Trainer
         }
       ]
     })

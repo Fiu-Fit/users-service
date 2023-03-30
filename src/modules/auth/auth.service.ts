@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { compare, genSaltSync, hashSync } from 'bcrypt';
 import { PrismaService } from '../../prisma.service';
-import { UserDto, UserRoles } from '../user/user.dto';
+import { UserDto } from '../user/user.dto';
 import { UserService } from '../user/user.service';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class AuthService {
       });
     }
 
-    if (!Object.values(UserRoles).includes(user.role)) {
+    if (!Object.values(Role).includes(user.role)) {
       throw new BadRequestException({
         message: 'Rol no valido',
       });
