@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule } from '@nestjs/microservices';
 import { PassportModule } from '@nestjs/passport';
-import { grcpClientOptions } from '../../../grcp-client-options';
+import { grpcClientOptions } from '../../../grpc-client-options';
 import { PrismaService } from '../../prisma.service';
 import { UserModule } from '../user/user.module';
 import { UserService } from '../user/user.service';
@@ -22,7 +22,7 @@ import { LocalStrategy } from './strategies/local.strategy';
     ClientsModule.register([
       {
         name: 'AUTH_PACKAGE',
-        ...grcpClientOptions,
+        ...grpcClientOptions,
       },
     ]),
   ],

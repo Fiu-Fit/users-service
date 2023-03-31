@@ -1,14 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions } from '@nestjs/microservices';
-import { grcpClientOptions } from '../grcp-client-options';
+import { grpcClientOptions } from '../grpc-client-options';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  console.log(grcpClientOptions);
-
-  app.connectMicroservice<MicroserviceOptions>(grcpClientOptions);
+  app.connectMicroservice<MicroserviceOptions>(grpcClientOptions);
   await app.startAllMicroservices();
 
   // app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
