@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package user;
+
+service UsersService {
+  rpc FindById (UserId) returns (User) {}
+  rpc FindAll (Empty) returns (stream User) {}
+  rpc Patch (User) returns (User) {}
+  rpc Put(User) returns (User) {}
+  rpc DeleteById (UserId) returns (Empty) {}
+}
+
+message UserId {
+  int32 id = 1;
+}
+
+message User {
+  int32 id = 1;
+  string firstName = 2;
+  string lastName = 3;
+  string email = 4;
+  Role role = 5;
+}
+
+message Empty {
+
+}
+
+enum Role {
+  Admin = 0;
+  Athlete = 1;
+  Trainer = 2;
+}

@@ -1,58 +1,47 @@
 import {
-  Body,
   Controller,
-  Delete,
-  Get,
-  NotFoundException,
+  Inject,
   Param,
   ParseIntPipe,
-  Patch,
-  Put,
   UseGuards,
 } from '@nestjs/common';
+import { ClientGrpc, GrpcMethod } from '@nestjs/microservices';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth-guard';
-import { UserDto } from './user.dto';
+import { UserData, UserId } from './interfaces/user.interface';
 import { UserService } from './user.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    @Inject('USER_PACKAGE') private readonly client: ClientGrpc
+  ) {}
 
-  @Get(':id')
-  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    const user = await this.userService.getUserById(id);
-    if (!user) {
-      throw new NotFoundException({
-        message: 'Usuario con el id proveido no fue encontrado',
-      });
-    }
-    return user;
+  @GrpcMethod('UsersService', 'FindById')
+  getUserById({ id }: UserId): Promise<User | null> {
+    return this.userService.getUserById(id);
   }
 
-  @Get()
+  @GrpcMethod('UsersService', 'FindAll')
   getUsers(): Promise<User[]> {
     return this.userService.getUsers();
   }
 
-  @Patch(':id')
-  editUser(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() user: Partial<UserDto>
-  ): Promise<User> {
-    return this.userService.editUser(id, user);
+  @GrpcMethod('UsersService', 'Patch')
+  editUser(user: UserData): Promise<User> {
+    const { id, ...rest } = user;
+    return this.userService.editUser(id, rest);
   }
 
-  @Put(':id')
-  putEditUser(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() user: UserDto
-  ): Promise<User> {
-    return this.userService.editUser(id, user);
+  @GrpcMethod('UsersService', 'Put')
+  putEditUser(user: UserData): Promise<User> {
+    const { id, ...rest } = user;
+    return this.userService.editUser(id, rest);
   }
 
-  @Delete(':id')
+  @GrpcMethod('UsersService', 'DeleteById')
   deleteUser(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.userService.deleteUser(id);
   }

@@ -1,18 +1,22 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions } from '@nestjs/microservices';
+import { grcpClientOptions } from '../grcp-client-options';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors(); //magic line
+  console.log(grcpClientOptions);
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  app.connectMicroservice<MicroserviceOptions>(grcpClientOptions);
+  await app.startAllMicroservices();
 
-  const port = parseInt(process.env.PORT || '3000');
-  await app.listen(port);
+  // app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
-  console.log(`App is running on PORT: ${port}`);
+  await app.listen(process.env.PORT || '8080');
+
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
+
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 bootstrap();
