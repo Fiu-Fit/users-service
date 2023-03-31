@@ -3,7 +3,6 @@ app/**/node_modules
 coverage
 lib
 dist
-.kovixstudio
 
 *.html
 *.css
