@@ -8,6 +8,7 @@ async function bootstrap() {
 
   app.connectMicroservice<MicroserviceOptions>(grpcClientOptions);
   await app.startAllMicroservices();
+  app.enableCors(); //  magic line
 
   // app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
