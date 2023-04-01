@@ -6,8 +6,9 @@ import {
   NotFoundException,
   Param,
   ParseIntPipe,
-  Patch, Put,
-  UseGuards
+  Patch,
+  Put,
+  UseGuards,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth-guard';
