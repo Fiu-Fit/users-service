@@ -21,9 +21,7 @@ export class UserService {
 
   getUserByEmail(email: string): Promise<User | null> {
     return this.prismaService.user.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
   }
 
