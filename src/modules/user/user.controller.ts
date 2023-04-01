@@ -1,9 +1,13 @@
 import {
-  Controller,
+  Body,
+  Controller, Delete,
+  Get,
   Inject,
   Param,
   ParseIntPipe,
-  UseGuards,
+  Patch,
+  Put,
+  UseGuards
 } from '@nestjs/common';
 import { ClientGrpc, GrpcMethod } from '@nestjs/microservices';
 import { User } from '@prisma/client';
@@ -20,29 +24,46 @@ export class UserController {
   ) {}
 
   @GrpcMethod('UsersService', 'FindById')
-  getUserById({ id }: UserId): Promise<User | null> {
-    return this.userService.getUserById(id);
+  @Get(':id')
+  getUserById(
+    data: UserId,
+    @Param('id', ParseIntPipe) paramId: number
+  ): Promise<User | null> {
+    return this.userService.getUserById(data?.id || paramId);
   }
 
   @GrpcMethod('UsersService', 'FindAll')
+  @Get()
   getUsers(): Promise<User[]> {
     return this.userService.getUsers();
   }
 
   @GrpcMethod('UsersService', 'Patch')
-  editUser(user: UserData): Promise<User> {
-    const { id, ...rest } = user;
-    return this.userService.editUser(id, rest);
+  @Patch(':id')
+  editUser(
+    user: UserData,
+    @Body() data: Omit<UserData, 'id'>,
+    @Param('id', ParseIntPipe) paramId: number
+  ): Promise<User> {
+    return this.userService.editUser(user?.id || paramId, user || data);
   }
 
   @GrpcMethod('UsersService', 'Put')
-  putEditUser(user: UserData): Promise<User> {
-    const { id, ...rest } = user;
-    return this.userService.editUser(id, rest);
+  @Put(':id')
+  putEditUser(
+    user: UserData,
+    @Param('id', ParseIntPipe) paramId: number,
+    @Body() data: Omit<UserData, 'id'>
+  ): Promise<User> {
+    return this.userService.editUser(user?.id || paramId, user || data);
   }
 
   @GrpcMethod('UsersService', 'DeleteById')
-  deleteUser(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    return this.userService.deleteUser(id);
+  @Delete(':id')
+  deleteUser(
+    data: UserId,
+    @Param('id', ParseIntPipe) paramId: number
+  ): Promise<User> {
+    return this.userService.deleteUser(data?.id || paramId);
   }
 }

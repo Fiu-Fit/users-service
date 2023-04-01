@@ -1,4 +1,4 @@
-import { Controller, Inject } from '@nestjs/common';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { ClientGrpc, GrpcMethod } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
 import { LoginRequest, RegisterRequest } from './interfaces/auth.interface';
@@ -11,12 +11,20 @@ export class AuthController {
   ) {}
 
   @GrpcMethod('AuthService', 'Register')
-  register(newUser: RegisterRequest): Promise<{ token: string }> {
-    return this.authService.register(newUser);
+  @Post('register')
+  register(
+    newUser: RegisterRequest,
+    @Body() body: RegisterRequest
+  ): Promise<{ token: string }> {
+    return this.authService.register(newUser || body);
   }
 
   @GrpcMethod('AuthService', 'login')
-  login(loginInfo: LoginRequest): Promise<{ token: string }> {
-    return this.authService.login(loginInfo);
+  @Post('login')
+  login(
+    loginInfo: LoginRequest,
+    @Body() body: LoginRequest
+  ): Promise<{ token: string }> {
+    return this.authService.login(loginInfo || body);
   }
 }
