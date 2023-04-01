@@ -36,6 +36,7 @@ lerna-debug.log*
 
 # dotenv
 .env
+.env.test
 
 # yarn .lock
 yarn.lock
