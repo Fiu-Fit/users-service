@@ -15,9 +15,7 @@ export class UserService {
 
   getUserById(id: number): Promise<User | null> {
     return this.prismaService.user.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
     });
   }
 
