@@ -1,7 +1,7 @@
+import { Page } from '@fiu-fit/common';
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
-import { Page, UserData } from './interfaces/user.interface';
 
 @Injectable()
 export class UserService {
@@ -28,7 +28,7 @@ export class UserService {
     });
   }
 
-  editUser(id: number, user: Omit<UserData, 'id'>): Promise<User> {
+  editUser(id: number, user: Omit<User, 'id'>): Promise<User> {
     return this.prismaService.user.update({
       where: {
         id,

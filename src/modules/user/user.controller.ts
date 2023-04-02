@@ -1,29 +1,25 @@
+import { Page } from '@fiu-fit/common';
 import {
   Body,
-  Controller, Delete,
+  Controller,
+  Delete,
   Get,
-  Inject,
   Param,
   ParseIntPipe,
   Patch,
   Put,
-  UseGuards
 } from '@nestjs/common';
-import { ClientGrpc, GrpcMethod } from '@nestjs/microservices';
+import { GrpcMethod } from '@nestjs/microservices';
 import { User } from '@prisma/client';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth-guard';
-import { UserData, UserId } from './interfaces/user.interface';
+import { USER_SERVICE_NAME, UserId } from './interfaces/user.pb';
 import { UserService } from './user.service';
 
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    @Inject('USER_PACKAGE') private readonly client: ClientGrpc
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
-  @GrpcMethod('UsersService', 'FindById')
+  @GrpcMethod(USER_SERVICE_NAME, 'FindById')
   @Get(':id')
   getUserById(
     data: UserId,
@@ -32,33 +28,33 @@ export class UserController {
     return this.userService.getUserById(data?.id || paramId);
   }
 
-  @GrpcMethod('UsersService', 'FindAll')
+  @GrpcMethod(USER_SERVICE_NAME, 'FindAll')
   @Get()
-  getUsers(): Promise<User[]> {
-    return this.userService.getUsers();
+  getUsers(): Promise<Page<User>> {
+    return this.userService.findAndCount();
   }
 
-  @GrpcMethod('UsersService', 'Patch')
+  @GrpcMethod(USER_SERVICE_NAME, 'Patch')
   @Patch(':id')
   editUser(
-    user: UserData,
-    @Body() data: Omit<UserData, 'id'>,
+    user: User,
+    @Body() data: Omit<User, 'id'>,
     @Param('id', ParseIntPipe) paramId: number
   ): Promise<User> {
     return this.userService.editUser(user?.id || paramId, user || data);
   }
 
-  @GrpcMethod('UsersService', 'Put')
+  @GrpcMethod(USER_SERVICE_NAME, 'Put')
   @Put(':id')
   putEditUser(
-    user: UserData,
+    user: User,
     @Param('id', ParseIntPipe) paramId: number,
-    @Body() data: Omit<UserData, 'id'>
+    @Body() data: Omit<User, 'id'>
   ): Promise<User> {
     return this.userService.editUser(user?.id || paramId, user || data);
   }
 
-  @GrpcMethod('UsersService', 'DeleteById')
+  @GrpcMethod(USER_SERVICE_NAME, 'DeleteById')
   @Delete(':id')
   deleteUser(
     data: UserId,

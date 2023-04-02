@@ -1,14 +1,14 @@
+import { DEFAULT_PROTO_PATH } from '@fiu-fit/common';
 import { ClientOptions, Transport } from '@nestjs/microservices';
-
-export const DefaultProtoPath = './src/modules';
+import { USER_PACKAGE_NAME } from './src/modules/user/interfaces/user.pb';
 
 export const grpcClientOptions: ClientOptions = {
   transport: Transport.GRPC,
   options:   {
-    package:   ['auth', 'user'],
+    package:   [USER_PACKAGE_NAME, 'auth'],
     protoPath: [
-      `${DefaultProtoPath}/user/user.proto`,
-      `${DefaultProtoPath}/auth/auth.proto`,
+      `${DEFAULT_PROTO_PATH}/user.proto`,
+      `${DEFAULT_PROTO_PATH}/auth.proto`,
     ],
   },
 };
