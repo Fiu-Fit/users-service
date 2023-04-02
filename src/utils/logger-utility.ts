@@ -1,4 +1,4 @@
-import winston from 'winston';
+import * as winston from 'winston';
 
 const { splat, combine, timestamp, label, printf, errors } = winston.format;
 const loggerInstances = new Map<string, winston.Logger>();
