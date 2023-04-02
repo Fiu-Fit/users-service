@@ -1,59 +1,69 @@
 import {
   Body,
-  Controller,
-  Delete,
+  Controller, Delete,
   Get,
-  NotFoundException,
+  Inject,
   Param,
   ParseIntPipe,
   Patch,
   Put,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
+import { ClientGrpc, GrpcMethod } from '@nestjs/microservices';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth-guard';
-import { UserDto } from './user.dto';
+import { UserData, UserId } from './interfaces/user.interface';
 import { UserService } from './user.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    @Inject('USER_PACKAGE') private readonly client: ClientGrpc
+  ) {}
 
+  @GrpcMethod('UsersService', 'FindById')
   @Get(':id')
-  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    const user = await this.userService.getUserById(id);
-    if (!user) {
-      throw new NotFoundException({
-        message: 'Usuario con el id proveido no fue encontrado',
-      });
-    }
-    return user;
+  getUserById(
+    data: UserId,
+    @Param('id', ParseIntPipe) paramId: number
+  ): Promise<User | null> {
+    return this.userService.getUserById(data?.id || paramId);
   }
 
+  @GrpcMethod('UsersService', 'FindAll')
   @Get()
   getUsers(): Promise<User[]> {
     return this.userService.getUsers();
   }
 
+  @GrpcMethod('UsersService', 'Patch')
   @Patch(':id')
   editUser(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() user: Partial<UserDto>
+    user: UserData,
+    @Body() data: Omit<UserData, 'id'>,
+    @Param('id', ParseIntPipe) paramId: number
   ): Promise<User> {
-    return this.userService.editUser(id, user);
+    return this.userService.editUser(user?.id || paramId, user || data);
   }
 
+  @GrpcMethod('UsersService', 'Put')
   @Put(':id')
   putEditUser(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() user: UserDto
+    user: UserData,
+    @Param('id', ParseIntPipe) paramId: number,
+    @Body() data: Omit<UserData, 'id'>
   ): Promise<User> {
-    return this.userService.editUser(id, user);
+    return this.userService.editUser(user?.id || paramId, user || data);
   }
 
+  @GrpcMethod('UsersService', 'DeleteById')
   @Delete(':id')
-  deleteUser(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    return this.userService.deleteUser(id);
+  deleteUser(
+    data: UserId,
+    @Param('id', ParseIntPipe) paramId: number
+  ): Promise<User> {
+    return this.userService.deleteUser(data?.id || paramId);
   }
 }

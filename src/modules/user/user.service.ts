@@ -1,16 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
-import { UserDto } from './user.dto';
+import { Page, UserData } from './interfaces/user.interface';
 
 @Injectable()
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  getUsers(): Promise<User[]> {
-    return this.prismaService.user.findMany({
-      orderBy: { id: 'asc' },
-    });
+  async findAndCount(): Promise<Page<User>> {
+    return {
+      rows: await this.prismaService.user.findMany({
+        orderBy: { id: 'asc' },
+      }),
+      count: await this.prismaService.user.count(),
+    };
   }
 
   getUserById(id: number): Promise<User | null> {
@@ -25,7 +28,7 @@ export class UserService {
     });
   }
 
-  editUser(id: number, user: Partial<UserDto> | UserDto): Promise<User> {
+  editUser(id: number, user: Omit<UserData, 'id'>): Promise<User> {
     return this.prismaService.user.update({
       where: {
         id,

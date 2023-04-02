@@ -1,22 +1,30 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
-import { User } from '@prisma/client';
-import { Request } from 'express';
-import { UserDto } from '../user/user.dto';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { ClientGrpc, GrpcMethod } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guards/local-auth-guard';
+import { LoginRequest, RegisterRequest } from './interfaces/auth.interface';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    @Inject('AUTH_PACKAGE') private readonly client: ClientGrpc
+  ) {}
 
-  @Post('signup')
-  signUpUser(@Body() user: UserDto): Promise<{ token: string }> {
-    return this.authService.signUpUser(user);
+  @GrpcMethod('AuthService', 'Register')
+  @Post('register')
+  register(
+    newUser: RegisterRequest,
+    @Body() body: RegisterRequest
+  ): Promise<{ token: string }> {
+    return this.authService.register(newUser || body);
   }
 
-  @UseGuards(LocalAuthGuard)
+  @GrpcMethod('AuthService', 'login')
   @Post('login')
-  loginUser(@Req() req: Request): { token: string } {
-    return this.authService.loginUser(req.user as User);
+  login(
+    loginInfo: LoginRequest,
+    @Body() body: LoginRequest
+  ): Promise<{ token: string }> {
+    return this.authService.login(loginInfo || body);
   }
 }

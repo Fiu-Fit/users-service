@@ -111,9 +111,11 @@
       "error"
     ],
     "import/no-extraneous-dependencies": [
-      "warn",
+      "error",
       {
-        "devDependencies": false
+        "devDependencies": false,
+        "optionalDependencies": false,
+        "peerDependencies": false
       }
     ],
     "import/order": [

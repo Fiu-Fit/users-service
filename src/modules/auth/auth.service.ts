@@ -5,6 +5,7 @@ import { compare, genSaltSync, hashSync } from 'bcrypt';
 import { PrismaService } from '../../prisma.service';
 import { UserDto } from '../user/user.dto';
 import { UserService } from '../user/user.service';
+import { LoginRequest, RegisterRequest } from './interfaces/auth.interface';
 
 @Injectable()
 export class AuthService {
@@ -17,29 +18,37 @@ export class AuthService {
   async validateNewUser(user: UserDto): Promise<void> {
     if (await this.userService.getUserByEmail(user.email)) {
       throw new BadRequestException({
-        message: 'Email esta en uso',
+        message: 'Email in use',
       });
     }
 
     if (!Object.values(Role).includes(user.role)) {
       throw new BadRequestException({
-        message: 'Rol no valido',
+        message: 'Invalid Role',
       });
     }
   }
 
-  async signUpUser(user: UserDto): Promise<{ token: string }> {
-    await this.validateNewUser(user);
+  async register(newUser: RegisterRequest): Promise<{ token: string }> {
+    await this.validateNewUser(newUser);
 
     const salt = genSaltSync(Number(process.env.SALT_ROUNDS));
-    user.password = hashSync(user.password, salt);
+    newUser.password = hashSync(newUser.password, salt);
 
-    const createdUser = await this.prismaService.user.create({ data: user });
+    const createdUser = await this.prismaService.user.create({ data: newUser });
 
     return this.createToken(createdUser);
   }
 
-  loginUser(user: User): { token: string } {
+  async login(loginInfo: LoginRequest): Promise<{ token: string }> {
+    const user = await this.validateUser(loginInfo.email, loginInfo.password);
+
+    if (!user) {
+      throw new BadRequestException({
+        message: 'Invalid Credentials',
+      });
+    }
+
     return this.createToken(user);
   }
 
