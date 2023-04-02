@@ -1,8 +1,8 @@
 import { Page } from '@fiu-fit/common';
+import grpc from '@grpc/grpc-js';
 import { Body, Controller, Param, ParseIntPipe } from '@nestjs/common';
 import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import { User } from '@prisma/client';
-import * as grpc from 'grpc';
 import { USER_SERVICE_NAME, UserId } from './interfaces/user.pb';
 import { UserService } from './user.service';
 
