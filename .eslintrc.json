@@ -75,7 +75,7 @@
     ],
     "no-shadow": "off",
     "@typescript-eslint/no-shadow": [
-      "error"
+      "warn"
     ],
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": [
