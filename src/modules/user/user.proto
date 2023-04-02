@@ -7,7 +7,7 @@ service UsersService {
   rpc FindAll (Empty) returns (stream User) {}
   rpc Patch (User) returns (User) {}
   rpc Put(User) returns (User) {}
-  rpc DeleteById (UserId) returns (Empty) {}
+  rpc DeleteById (UserId) returns (User) {}
 }
 
 message UserId {
