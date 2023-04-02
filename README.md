@@ -39,9 +39,10 @@ yarn prisma:dev:deploy
 
 ### 🚀 Como levantar el proyecto 
 
-Para levantar el proyecto, primero hay que inicializar la DB de _dev_. Luego, es necesario iniciar el microservicio. Para lograr esto, debemos ejecutar los siguientes comandos:
-1. `yarn db:dev:up`
-2. `yarn start`
+Para levantar el proyecto:
+```bash
+yarn start
+```
 
 ### 🧪 Como ejecutar los tests 
 Para ejecutar los tests, primero hay que inicializar la DB de _test_. Luego, ejecutamos el comando adecuado en base a que test queremos ejecutar ([comandos](#comandos))
