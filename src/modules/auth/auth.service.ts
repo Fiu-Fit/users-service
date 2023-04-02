@@ -18,13 +18,13 @@ export class AuthService {
   async validateNewUser(user: UserDto): Promise<void> {
     if (await this.userService.getUserByEmail(user.email)) {
       throw new BadRequestException({
-        message: 'Email esta en uso',
+        message: 'Email in use',
       });
     }
 
     if (!Object.values(Role).includes(user.role)) {
       throw new BadRequestException({
-        message: 'Rol no valido',
+        message: 'Invalid Role',
       });
     }
   }
@@ -45,7 +45,7 @@ export class AuthService {
 
     if (!user) {
       throw new BadRequestException({
-        message: 'Credenciales invalidas',
+        message: 'Invalid Credentials',
       });
     }
 
