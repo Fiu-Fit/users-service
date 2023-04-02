@@ -1,16 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
-import { UserData } from './interfaces/user.interface';
+import { Page, UserData } from './interfaces/user.interface';
 
 @Injectable()
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  getUsers(): Promise<User[]> {
-    return this.prismaService.user.findMany({
-      orderBy: { id: 'asc' },
-    });
+  async findAndCount(): Promise<Page<User>> {
+    return {
+      rows: await this.prismaService.user.findMany({
+        orderBy: { id: 'asc' },
+      }),
+      count: await this.prismaService.user.count(),
+    };
   }
 
   getUserById(id: number): Promise<User | null> {
