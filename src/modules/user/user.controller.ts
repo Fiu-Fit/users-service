@@ -1,5 +1,5 @@
 import { Page } from '@fiu-fit/common';
-import grpc from '@grpc/grpc-js';
+import { status } from '@grpc/grpc-js';
 import { Body, Controller, Param, ParseIntPipe } from '@nestjs/common';
 import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import { User } from '@prisma/client';
@@ -17,7 +17,7 @@ export class UserController {
 
     if (!user) {
       throw new RpcException({
-        code:    grpc.status.NOT_FOUND,
+        code:    status.NOT_FOUND,
         message: 'User not found',
       });
     }
