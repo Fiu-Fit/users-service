@@ -35,7 +35,10 @@
     "common:install": "yarn add ssh://git@github.com:Fiu-Fit/common.git && yarn",
     "proto:user": "npx protoc --plugin=node_modules/.bin/protoc-gen-ts_proto -I=./node_modules/@fiu-fit/common/src/protos --ts_proto_out=src/modules/user/interfaces/ node_modules/@fiu-fit/common/src/protos/user.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
     "proto:auth": "npx protoc --plugin=node_modules/.bin/protoc-gen-ts_proto -I=./node_modules/@fiu-fit/common/src/protos --ts_proto_out=src/modules/auth/interfaces/ node_modules/@fiu-fit/common/src/protos/auth.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
-    "proto:all": "yarn run common:install && yarn run proto:user && yarn run proto:auth"
+    "proto:all": "yarn run common:install && yarn run proto:user && yarn run proto:auth",
+    "proto:user:win": "npx protoc --plugin=node_modules/.bin/protoc-gen-ts_proto.cmd -I=./node_modules/@fiu-fit/common/src/protos --ts_proto_out=src/modules/user/interfaces/ node_modules/@fiu-fit/common/src/protos/user.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
+    "proto:auth:win": "npx protoc --plugin=node_modules/.bin/protoc-gen-ts_proto.cmd -I=./node_modules/@fiu-fit/common/src/protos --ts_proto_out=src/modules/auth/interfaces/ node_modules/@fiu-fit/common/src/protos/auth.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
+    "proto:all:win": "yarn run common:install && yarn run proto:user:win && yarn run proto:auth:win"
   },
   "prisma": {
     "seed": "ts-node ./prisma/seeder.ts"
