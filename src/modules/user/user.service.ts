@@ -1,7 +1,8 @@
-import { Page, RoleEnumToName } from '@fiu-fit/common';
+import { Page } from '@fiu-fit/common';
 import { Injectable } from '@nestjs/common';
-import { Role, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
+import { RoleTransformer } from '../../shared/RoleTransformer';
 import { UserDTO } from './user.dto';
 
 @Injectable()
@@ -36,7 +37,7 @@ export class UserService {
       },
       data: {
         ...user,
-        role: Role[RoleEnumToName[user.role] as keyof typeof Role],
+        role: RoleTransformer(user.role),
       },
     });
   }
