@@ -5,7 +5,11 @@ import { compare, genSaltSync, hashSync } from 'bcrypt';
 import { PrismaService } from '../../prisma.service';
 import { RoleTransformer } from '../../shared/RoleTransformer';
 import { UserService } from '../user/user.service';
-import { LoginRequest, RegisterRequest } from './interfaces/auth.interface';
+import {
+  JwtPayload,
+  LoginRequest,
+  RegisterRequest,
+} from './interfaces/auth.interface';
 
 @Injectable()
 export class AuthService {
@@ -72,5 +76,10 @@ export class AuthService {
     }
     const isValidPassword = await compare(password, user.password);
     return isValidPassword ? user : null;
+  }
+
+  validateUserByToken(token: string): Promise<User | null> {
+    const payload = this.jwtService.verify<JwtPayload>(token);
+    return this.userService.getUserByEmail(payload.email);
   }
 }
