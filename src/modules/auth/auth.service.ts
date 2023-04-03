@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Role, User } from '@prisma/client';
 import { compare, genSaltSync, hashSync } from 'bcrypt';
 import { PrismaService } from '../../prisma.service';
-import { UserDto } from '../user/user.dto';
+import { RoleTransformer } from '../../shared/RoleTransformer';
 import { UserService } from '../user/user.service';
 import { LoginRequest, RegisterRequest } from './interfaces/auth.interface';
 
@@ -15,14 +15,14 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async validateNewUser(user: UserDto): Promise<void> {
+  async validateNewUser(user: RegisterRequest): Promise<void> {
     if (await this.userService.getUserByEmail(user.email)) {
       throw new BadRequestException({
         message: 'Email in use',
       });
     }
 
-    if (!Object.values(Role).includes(user.role)) {
+    if (!Object.values(Role).includes(RoleTransformer(user.role))) {
       throw new BadRequestException({
         message: 'Invalid Role',
       });
@@ -35,7 +35,9 @@ export class AuthService {
     const salt = genSaltSync(Number(process.env.SALT_ROUNDS));
     newUser.password = hashSync(newUser.password, salt);
 
-    const createdUser = await this.prismaService.user.create({ data: newUser });
+    const createdUser = await this.prismaService.user.create({
+      data: { ...newUser, role: RoleTransformer(newUser.role) },
+    });
 
     return this.createToken(createdUser);
   }

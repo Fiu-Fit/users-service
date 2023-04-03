@@ -1,7 +1,8 @@
-import { Page } from '@fiu-fit/common';
+import { Page, RoleEnumToName } from '@fiu-fit/common';
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
+import { UserDTO } from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -28,12 +29,15 @@ export class UserService {
     });
   }
 
-  editUser(id: number, user: Omit<User, 'id'>): Promise<User> {
+  editUser(id: number, user: UserDTO): Promise<User> {
     return this.prismaService.user.update({
       where: {
         id,
       },
-      data: user,
+      data: {
+        ...user,
+        role: Role[RoleEnumToName[user.role] as keyof typeof Role],
+      },
     });
   }
 

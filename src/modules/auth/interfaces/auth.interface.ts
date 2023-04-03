@@ -1,11 +1,9 @@
-import { Role } from '@prisma/client';
-
 export interface RegisterRequest {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
-  role: Role;
+  role: number;
 }
 
 export interface LoginRequest {
