@@ -10,3 +10,8 @@ export interface LoginRequest {
   email: string;
   password: string;
 }
+
+export interface JwtPayload {
+  email: string;
+  sub: number;
+}
