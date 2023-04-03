@@ -1,9 +1,10 @@
 import { Page } from '@fiu-fit/common';
-import { status } from '@grpc/grpc-js';
-import { Body, Controller, Param, ParseIntPipe } from '@nestjs/common';
-import { GrpcMethod, RpcException } from '@nestjs/microservices';
+import { Controller } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
 import { User } from '@prisma/client';
+import { NotFoundException } from '../../shared/rpc-exceptions/NotFoundException';
 import { USER_SERVICE_NAME, UserId } from './interfaces/user.pb';
+import { UserDTO } from './user.dto';
 import { UserService } from './user.service';
 
 // @UseGuards(JwtAuthGuard)
@@ -16,10 +17,7 @@ export class UserController {
     const user = await this.userService.getUserById(data?.id);
 
     if (!user) {
-      throw new RpcException({
-        code:    status.NOT_FOUND,
-        message: 'User not found',
-      });
+      throw new NotFoundException('User not found');
     }
 
     return this.userService.getUserById(data?.id);
@@ -30,22 +28,26 @@ export class UserController {
     return this.userService.findAndCount();
   }
 
-  @GrpcMethod(USER_SERVICE_NAME, 'Patch')
-  editUser(
-    user: User,
-    @Body() data: Omit<User, 'id'>,
-    @Param('id', ParseIntPipe) paramId: number
-  ): Promise<User> {
-    return this.userService.editUser(user?.id || paramId, user || data);
-  }
-
   @GrpcMethod(USER_SERVICE_NAME, 'Put')
-  putEditUser(user: User): Promise<User> {
-    return this.userService.editUser(user?.id, user);
+  async putEditUser(user: UserDTO): Promise<User> {
+    const editedUser = await this.userService.editUser(user?.id, user);
+
+    if (!editedUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    return editedUser;
   }
 
   @GrpcMethod(USER_SERVICE_NAME, 'DeleteById')
-  deleteUser(data: UserId): Promise<User> {
-    return this.userService.deleteUser(data?.id);
+  async deleteUser(data: UserId): Promise<User | undefined> {
+    try {
+      return await this.userService.deleteUser(data?.id);
+    } catch (e) {
+      if ((e as any)?.code === 'P2025') {
+        throw new NotFoundException('User not found');
+      }
+      throw e;
+    }
   }
 }
