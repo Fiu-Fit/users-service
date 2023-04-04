@@ -5,11 +5,8 @@ import { compare, genSaltSync, hashSync } from 'bcrypt';
 import { PrismaService } from '../../prisma.service';
 import { RoleTransformer } from '../../shared/RoleTransformer';
 import { UserService } from '../user/user.service';
-import {
-  JwtPayload,
-  LoginRequest,
-  RegisterRequest,
-} from './interfaces/auth.interface';
+import { JwtPayload } from './interfaces/auth.interface';
+import { LoginRequest, RegisterRequest } from './interfaces/auth.pb';
 
 @Injectable()
 export class AuthService {
