@@ -62,7 +62,7 @@ export function UserServiceControllerMethods() {
         constructor.prototype,
         method
       );
-      GrpcMethod('UserService', method)(
+      GrpcMethod(USER_SERVICE_NAME, method)(
         constructor.prototype[method],
         method,
         descriptor
@@ -74,7 +74,7 @@ export function UserServiceControllerMethods() {
         constructor.prototype,
         method
       );
-      GrpcStreamMethod('UserService', method)(
+      GrpcStreamMethod(USER_SERVICE_NAME, method)(
         constructor.prototype[method],
         method,
         descriptor

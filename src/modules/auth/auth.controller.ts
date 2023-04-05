@@ -3,13 +3,18 @@ import { ClientGrpc, GrpcMethod } from '@nestjs/microservices';
 import { NotFoundException } from '../../shared/rpc-exceptions/NotFoundException';
 import { AuthService } from './auth.service';
 import { LoginRequest, RegisterRequest } from './interfaces/auth.interface';
-import { AUTH_SERVICE_NAME, Token, ValidResponse } from './interfaces/auth.pb';
+import {
+  AUTH_PACKAGE_NAME,
+  AUTH_SERVICE_NAME,
+  Token,
+  ValidResponse,
+} from './interfaces/auth.pb';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    @Inject('AUTH_PACKAGE') private readonly client: ClientGrpc
+    @Inject(AUTH_PACKAGE_NAME) private readonly client: ClientGrpc
   ) {}
 
   @GrpcMethod(AUTH_SERVICE_NAME)

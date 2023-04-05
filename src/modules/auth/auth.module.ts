@@ -8,6 +8,7 @@ import { UserModule } from '../user/user.module';
 import { UserService } from '../user/user.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { AUTH_PACKAGE_NAME } from './interfaces/auth.pb';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 
@@ -21,7 +22,7 @@ import { LocalStrategy } from './strategies/local.strategy';
     }),
     ClientsModule.register([
       {
-        name: 'AUTH_PACKAGE',
+        name: AUTH_PACKAGE_NAME,
         ...grpcClientOptions,
       },
     ]),
