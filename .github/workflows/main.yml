@@ -16,8 +16,18 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: 16
+
+    - name: Setup SSH
+      uses: MrSquaare/ssh-setup-action@v1
+      with:
+          host: github.com
+          private-key: ${{ secrets.COMMON_SSH_KEY }}
+
     - name: Install Yarn
       run: npm install -g yarn
+
+    - name: Install common
+      run: yarn common:install
 
     - name: Install dependencies with Yarn
       run: yarn install --frozen-lockfile
