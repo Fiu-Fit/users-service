@@ -85,6 +85,7 @@
         "ignoreRestSiblings": true
       }
     ],
+    "no-console": "error",
     "quotes": "off",
     "@typescript-eslint/quotes": [
       "error",
