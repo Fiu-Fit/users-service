@@ -27,6 +27,10 @@ jobs:
 
     - name: Install common
       run: yarn common:install
+      env:
+        # GITHUB_TOKEN can't access packages hosted in private repos,
+        # even within the same organisation
+        NODE_AUTH_TOKEN: ${{ secrets.PAT }}
 
     - name: Install dependencies with Yarn
       run: yarn install --frozen-lockfile
