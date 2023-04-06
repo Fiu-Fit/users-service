@@ -15,7 +15,7 @@ jobs:
     - name: Set PAT
       id: step_one
       run: |
-        echo "PAT=${{ secrets.COMMON_SSH_KEY }}" >> $GITHUB_ENV
+        echo "COMMON_SSH_KEY=${{ secrets.COMMON_SSH_KEY }}" >> $GITHUB_ENV
 
     - name: Configure SSH
       uses: webfactory/ssh-agent@v0.8.0
