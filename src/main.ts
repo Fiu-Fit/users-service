@@ -5,6 +5,8 @@ import { grpcClientOptions } from '../grpc-client-options';
 import { AppModule } from './app.module';
 import LoggerFactory from './utils/logger-utility';
 
+//add comment to test actions
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 

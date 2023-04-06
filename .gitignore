@@ -38,7 +38,4 @@ lerna-debug.log*
 .env
 .env.test
 
-# yarn .lock
-yarn.lock
-
 /.ssh
