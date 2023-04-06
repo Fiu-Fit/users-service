@@ -10,14 +10,12 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        token: ${{ secrets.PAT }}
+      uses: actions/checkout@v1
     
     - name: Configure SSH
       uses: webfactory/ssh-agent@v0.2.0
       with:
-        ssh-private-key: ${{ secrets.COMMON_SSH_KEY }}
+        ssh-private-key: ${{ secrets.PAT }}
 
     - name: Set up Node.js
       uses: actions/setup-node@v2
