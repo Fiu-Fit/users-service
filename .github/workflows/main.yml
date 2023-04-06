@@ -22,6 +22,7 @@ jobs:
       with:
           host: github.com
           private-key: ${{ secrets.COMMON_SSH_KEY }}
+          private-key-name: id_ed25519
 
     - name: Install Yarn
       run: npm install -g yarn
