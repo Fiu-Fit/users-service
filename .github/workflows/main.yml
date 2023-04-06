@@ -17,7 +17,7 @@ jobs:
     - name: Configure SSH
       uses: webfactory/ssh-agent@v0.2.0
       with:
-        ssh-private-key: ${{ secrets.PAT }}
+        ssh-private-key: ${{ secrets.COMMON_SSH_KEY }}
 
     - name: Set up Node.js
       uses: actions/setup-node@v2
