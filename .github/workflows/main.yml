@@ -12,15 +12,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
             
-    - name: Set PAT
-      id: step_one
-      run: |
-        echo "COMMON_SSH_KEY=${{ secrets.COMMON_SSH_KEY }}" >> $GITHUB_ENV
-
     - name: Configure SSH
       uses: webfactory/ssh-agent@v0.8.0
       with:
-        ssh-private-key: ${{ env.COMMON_SSH_KEY }}
+        ssh-private-key: ${{ secrets.COMMON_SSH_KEY }}
 
     - name: Set up Node.js
       uses: actions/setup-node@v2
