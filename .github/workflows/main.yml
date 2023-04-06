@@ -18,7 +18,7 @@ jobs:
         node-version: 16
 
     - name: Setup SSH
-      uses: MrSquaare/ssh-setup-action@v1
+      uses: webfactory/ssh-agent@v0.2.0
       with:
           host: github.com
           private-key: ${{ secrets.COMMON_SSH_KEY }}
