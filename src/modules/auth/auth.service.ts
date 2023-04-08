@@ -4,6 +4,8 @@ import { Role, User } from '@prisma/client';
 import { compare, genSaltSync, hashSync } from 'bcrypt';
 import { PrismaService } from '../../prisma.service';
 import { RoleTransformer } from '../../shared/RoleTransformer';
+import { AlreadyExistsException } from '../../shared/rpc-exceptions/AlreadyExistsException';
+import { InvalidArgumentException } from '../../shared/rpc-exceptions/InvalidArgumentException';
 import { UserService } from '../user/user.service';
 import {
   JwtPayload,
@@ -21,15 +23,11 @@ export class AuthService {
 
   async validateNewUser(user: RegisterRequest): Promise<void> {
     if (await this.userService.getUserByEmail(user.email)) {
-      throw new BadRequestException({
-        message: 'Email in use',
-      });
+      throw new AlreadyExistsException('Email in use');
     }
 
     if (!Object.values(Role).includes(RoleTransformer(user.role))) {
-      throw new BadRequestException({
-        message: 'Invalid Role',
-      });
+      throw new InvalidArgumentException('Invalid Role');
     }
   }
 
