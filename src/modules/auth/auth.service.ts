@@ -7,11 +7,8 @@ import { RoleTransformer } from '../../shared/RoleTransformer';
 import { AlreadyExistsException } from '../../shared/rpc-exceptions/AlreadyExistsException';
 import { InvalidArgumentException } from '../../shared/rpc-exceptions/InvalidArgumentException';
 import { UserService } from '../user/user.service';
-import {
-  JwtPayload,
-  LoginRequest,
-  RegisterRequest,
-} from './interfaces/auth.interface';
+import { JwtPayload } from './interfaces/auth.interface';
+import { LoginRequest, RegisterRequest } from './interfaces/auth.pb';
 
 @Injectable()
 export class AuthService {

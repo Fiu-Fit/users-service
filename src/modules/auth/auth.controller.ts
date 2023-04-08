@@ -2,8 +2,13 @@ import { Body, Controller, HttpStatus, Inject, Post } from '@nestjs/common';
 import { ClientGrpc, GrpcMethod } from '@nestjs/microservices';
 import { UnauthorizedException } from '../../shared/rpc-exceptions/UnauthenticatedException';
 import { AuthService } from './auth.service';
-import { LoginRequest, RegisterRequest } from './interfaces/auth.interface';
-import { AUTH_SERVICE_NAME, Token, ValidResponse } from './interfaces/auth.pb';
+import {
+  AUTH_SERVICE_NAME,
+  LoginRequest,
+  RegisterRequest,
+  Token,
+  ValidResponse,
+} from './interfaces/auth.pb';
 
 @Controller('auth')
 export class AuthController {
