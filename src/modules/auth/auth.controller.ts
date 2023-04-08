@@ -1,6 +1,6 @@
 import { Body, Controller, HttpStatus, Inject, Post } from '@nestjs/common';
 import { ClientGrpc, GrpcMethod } from '@nestjs/microservices';
-import { NotFoundException } from '../../shared/rpc-exceptions/NotFoundException';
+import { UnauthorizedException } from '../../shared/rpc-exceptions/UnauthenticatedException';
 import { AuthService } from './auth.service';
 import { LoginRequest, RegisterRequest } from './interfaces/auth.interface';
 import { AUTH_SERVICE_NAME, Token, ValidResponse } from './interfaces/auth.pb';
@@ -35,7 +35,7 @@ export class AuthController {
   async validate(request: Token): Promise<ValidResponse> {
     const user = await this.authService.validateUserByToken(request.token);
 
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new UnauthorizedException('The token is invalid');
 
     return { status: HttpStatus.OK, errors: [], userId: user.id };
   }
