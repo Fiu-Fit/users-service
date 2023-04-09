@@ -15,8 +15,13 @@ jobs:
     - name: Configure SSH
       uses: webfactory/ssh-agent@v0.8.0
       with:
-        ssh-private-key: ${{ secrets.COMMON_SSH_KEY }}
+        ssh-private-key: ${{ secrets.GITHUB_SSH_KEY }}
 
+    - name: Copy secrets file
+      run: |
+        echo $RENDER_SECRET > ./secrets.env
+        render secrets upsert common-secrets --data-file ./secrets.env --overwrite
+        
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
@@ -25,8 +30,8 @@ jobs:
     - name: Install Yarn
       run: npm install -g yarn
 
-    - name: Install common
-      run: yarn common:install
-
     - name: Install dependencies with Yarn
       run: yarn install --frozen-lockfile
+    
+    - name: Run Unit Tests
+      run: yarn test
