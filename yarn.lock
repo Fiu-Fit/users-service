@@ -10,6 +10,17 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
+"@angular-devkit/core@15.2.3":
+  version "15.2.3"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-15.2.3.tgz#d7c96631f6d1ebe0a6f2d55c7d7ea3119090f84c"
+  integrity sha512-/x6rnIc2nbosg9zsneBCdlW+qPJCnbItrzok6Pf5n+3YEY3DFNt8cEgvNymW/u8uiehLYFoAoCq4HIwEXhzoYQ==
+  dependencies:
+    ajv "8.12.0"
+    ajv-formats "2.1.1"
+    jsonc-parser "3.2.0"
+    rxjs "6.6.7"
+    source-map "0.7.4"
+
 "@angular-devkit/core@15.2.4":
   version "15.2.4"
   resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-15.2.4.tgz#f7696f09c66d01568a07f0e71672e887fdf57280"
