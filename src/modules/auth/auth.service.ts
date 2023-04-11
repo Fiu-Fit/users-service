@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Role, User } from '@prisma/client';
-import { compare } from 'bcrypt';
 import {
   UserCredential,
   createUserWithEmailAndPassword,
   getAuth,
   signInWithEmailAndPassword,
+  signOut,
 } from 'firebase/auth';
 import { PrismaService } from '../../prisma.service';
 import { RoleTransformer } from '../../shared/RoleTransformer';
@@ -39,57 +39,61 @@ export class AuthService {
 
     const auth = getAuth(firebaseApp);
     let userCredentials: UserCredential;
+    let token: string;
     try {
       userCredentials = await createUserWithEmailAndPassword(
         auth,
         newUser.email,
         newUser.password
       );
+      const { password, ...userData } = newUser;
+      await this.prismaService.user.create({
+        data: {
+          ...userData,
+          uid:  userCredentials.user.uid,
+          role: RoleTransformer(userData.role),
+        },
+      });
+
+      token = await userCredentials.user.getIdToken();
     } catch (error) {
       throw new BadRequestException({
         message: `Error while registering: ${error}`,
       });
     }
 
-    return this.createToken(userCredentials.user.uid, newUser.email);
+    return { token };
   }
 
   async login(loginInfo: LoginRequest): Promise<{ token: string }> {
     const auth = getAuth(firebaseApp);
     let userCredentials: UserCredential;
+    let token: string;
     try {
       userCredentials = await signInWithEmailAndPassword(
         auth,
         loginInfo.email,
         loginInfo.password
       );
+      token = await userCredentials.user.getIdToken();
     } catch (error) {
       throw new BadRequestException({
         message: 'Invalid Credentials',
       });
     }
 
-    return this.createToken(userCredentials.user.uid, loginInfo.email);
+    return { token };
   }
 
-  createToken(uid: string, email: string): { token: string } {
-    const payload = {
-      uid,
-      email,
-    };
-
-    return {
-      token: this.jwtService.sign(payload),
-    };
-  }
-
-  async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.userService.getUserByEmail(email);
-    if (!user) {
-      return null;
+  async logout(): Promise<void> {
+    const auth = getAuth(firebaseApp);
+    try {
+      await signOut(auth);
+    } catch (error) {
+      throw new BadRequestException({
+        message: `Error while logging out: ${error}`,
+      });
     }
-    const isValidPassword = await compare(password, user.password);
-    return isValidPassword ? user : null;
   }
 
   validateUserByToken(token: string): Promise<User | null> {
