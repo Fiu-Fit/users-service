@@ -10,13 +10,11 @@ import {
 } from 'firebase/auth';
 import { PrismaService } from '../../prisma.service';
 import { RoleTransformer } from '../../shared/RoleTransformer';
+import { InvalidArgumentException } from '../../shared/rpc-exceptions/InvalidArgumentException';
 import { UserService } from '../user/user.service';
 import { firebaseApp } from './firebase';
-import {
-  JwtPayload,
-  LoginRequest,
-  RegisterRequest,
-} from './interfaces/auth.interface';
+import { JwtPayload } from './interfaces/auth.interface';
+import { LoginRequest, RegisterRequest } from './interfaces/auth.pb';
 
 @Injectable()
 export class AuthService {
@@ -28,9 +26,7 @@ export class AuthService {
 
   validateNewUser(user: RegisterRequest): void {
     if (!Object.values(Role).includes(RoleTransformer(user.role))) {
-      throw new BadRequestException({
-        message: 'Invalid Role',
-      });
+      throw new InvalidArgumentException('Invalid Role');
     }
   }
 

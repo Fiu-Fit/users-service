@@ -7,7 +7,6 @@ import { USER_SERVICE_NAME, UserId } from './interfaces/user.pb';
 import { UserDTO } from './user.dto';
 import { UserService } from './user.service';
 
-// @UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}

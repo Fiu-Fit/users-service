@@ -41,6 +41,8 @@ export interface AuthServiceClient {
 
   login(request: LoginRequest): Observable<Token>;
 
+  logout(): any;
+
   validate(request: Token): Observable<ValidResponse>;
 }
 

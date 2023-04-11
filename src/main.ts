@@ -1,9 +1,11 @@
+import { LoggerFactory } from '@fiu-fit/common';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions } from '@nestjs/microservices';
 import { grpcClientOptions } from '../grpc-client-options';
 import { AppModule } from './app.module';
-import LoggerFactory from './utils/logger-utility';
+
+// add comment to test actions
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule } from '@nestjs/microservices';
-import { PassportModule } from '@nestjs/passport';
 import { grpcClientOptions } from '../../../grpc-client-options';
 import { PrismaService } from '../../prisma.service';
 import { UserModule } from '../user/user.module';
@@ -12,7 +11,6 @@ import { AuthService } from './auth.service';
 @Module({
   imports: [
     UserModule,
-    PassportModule,
     JwtModule.register({
       secret:      process.env.JWT_PRIVATE_KEY,
       signOptions: { expiresIn: process.env.JWT_EXPIRATION },
