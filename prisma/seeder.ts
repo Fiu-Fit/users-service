@@ -7,31 +7,28 @@ async function main() {
     prisma.user.createMany({
       data: [
         {
+          uid:       '1',
           firstName: 'Ian',
           lastName:  'Shih',
           email:     'ishih@fi.uba.ar',
-          password:
-            '$2b$10$RE5erES6xyuBiI92pxrAhuaSvmygFBJ3zNEtH9ylLrLyqhOSW36Cq',
-          role: Role.Admin
+          role:      Role.Admin,
         },
         {
+          uid:       '2',
           firstName: 'Manuel',
           lastName:  'Sanchez Fernandez de la Vega',
           email:     'msanchezf@fi.uba.ar',
-          password:
-            '$2b$10$RE5erES6xyuBiI92pxrAhuaSvmygFBJ3zNEtH9ylLrLyqhOSW36Cq',
-          role: Role.Athlete
+          role:      Role.Athlete,
         },
         {
+          uid:       '3',
           firstName: 'Rocio',
           lastName:  'Platini',
           email:     'rplatinif@fi.uba.ar',
-          password:
-            '$2b$10$RE5erES6xyuBiI92pxrAhuaSvmygFBJ3zNEtH9ylLrLyqhOSW36Cq',
-          role: Role.Trainer
-        }
-      ]
-    })
+          role:      Role.Trainer,
+        },
+      ],
+    }),
   ]);
 }
 
