@@ -1,9 +1,9 @@
 FROM postgres
 
 COPY package.json .
-COPY yarn.lock
+COPY yarn.lock .
 
-RUN yarn install --frozen-lockfile .
+RUN yarn install --frozen-lockfile
 
 ENV POSTGRES_USER=postgres
 ENV POSTGRES_PASSWORD=postgres
