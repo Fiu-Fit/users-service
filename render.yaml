@@ -1,5 +1,6 @@
 services:
-  - name: dev-db
+  - type: web
+    name: dev-db
     image: "postgres"
     env:
       - "POSTGRES_USER=postgres"
@@ -16,7 +17,8 @@ services:
     network:
       - name: fiu-fit
 
-  - name: test-db
+  - type: web
+    name: test-db
     image: "postgres"
     env:
       - "POSTGRES_USER=postgres"
