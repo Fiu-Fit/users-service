@@ -10,6 +10,7 @@ services:
         fromService:
           type: web
           name: Fiu-Fit-users-service
+          envVarKey: DATABASE_URL
 
   - type: web
     name: test-db
@@ -22,5 +23,6 @@ services:
         fromService:
           type: web
           name: Fiu-Fit-users-service
+          envVarKey: DATABASE_URL
 
 
