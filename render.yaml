@@ -1,6 +1,7 @@
 services:
   - type: web
     name: dev-db
+    plan: free
     image: "postgres"
     env:
       - "POSTGRES_USER=postgres"
@@ -19,6 +20,7 @@ services:
 
   - type: web
     name: test-db
+    plan: free
     image: "postgres"
     env:
       - "POSTGRES_USER=postgres"
