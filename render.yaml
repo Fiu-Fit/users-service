@@ -3,7 +3,6 @@ services:
     name: dev-db
     env: docker
     plan: free
-    image: "postgres"
     dockerCommand: "docker compose up dev-db -d"
     dockerfilePath: ./docker-compose.yml
     envVars:
@@ -16,7 +15,6 @@ services:
     name: test-db
     plan: free
     env: docker
-    image: "postgres"
     dockerCommand: "docker compose up test-db -d"
     dockerfilePath: ./docker-compose.yml
     envVars:
