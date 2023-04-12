@@ -1,5 +1,7 @@
 FROM postgres
 
+RUN npm install -g yarn
+
 COPY package.json .
 COPY yarn.lock .
 
