@@ -6,10 +6,10 @@ services:
     image: "postgres"
     dockerCommand: "docker compose up dev-db -d"
     envVars:
-      -key: DATABASE_URL
-      fromService:
-        type: web
-        name: Fiu-Fit-users-service
+      - key: DATABASE_URL
+        fromService:
+          type: web
+          name: Fiu-Fit-users-service
 
   - type: web
     name: test-db
