@@ -5,6 +5,7 @@ services:
     plan: free
     image: "postgres"
     dockerCommand: "docker compose up dev-db -d"
+    dockerfilePath: ./docker-compose.yml
     envVars:
       - key: DATABASE_URL
         fromService:
@@ -17,9 +18,11 @@ services:
     env: docker
     image: "postgres"
     dockerCommand: "docker compose up test-db -d"
+    dockerfilePath: ./docker-compose.yml
     envVars:
-      -key: DATABASE_URL
-      fromService:
-        type: web
-        name: Fiu-Fit-users-service
+      - key: DATABASE_URL
+        fromService:
+          type: web
+          name: Fiu-Fit-users-service
+
 
