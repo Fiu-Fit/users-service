@@ -1,12 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Role, User } from '@prisma/client';
-import { compare, genSaltSync, hashSync } from 'bcrypt';
+import {
+  UserCredential,
+  createUserWithEmailAndPassword,
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth';
 import { PrismaService } from '../../prisma.service';
 import { RoleTransformer } from '../../shared/RoleTransformer';
-import { AlreadyExistsException } from '../../shared/rpc-exceptions/AlreadyExistsException';
 import { InvalidArgumentException } from '../../shared/rpc-exceptions/InvalidArgumentException';
 import { UserService } from '../user/user.service';
+import { firebaseApp } from './firebase';
 import { JwtPayload } from './interfaces/auth.interface';
 import { LoginRequest, RegisterRequest } from './interfaces/auth.pb';
 
@@ -18,59 +24,72 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async validateNewUser(user: RegisterRequest): Promise<void> {
-    if (await this.userService.getUserByEmail(user.email)) {
-      throw new AlreadyExistsException('Email in use');
-    }
-
+  validateNewUser(user: RegisterRequest): void {
     if (!Object.values(Role).includes(RoleTransformer(user.role))) {
       throw new InvalidArgumentException('Invalid Role');
     }
   }
 
   async register(newUser: RegisterRequest): Promise<{ token: string }> {
-    await this.validateNewUser(newUser);
+    this.validateNewUser(newUser);
 
-    const salt = genSaltSync(Number(process.env.SALT_ROUNDS));
-    newUser.password = hashSync(newUser.password, salt);
+    const auth = getAuth(firebaseApp);
+    let userCredentials: UserCredential;
+    let token: string;
+    try {
+      userCredentials = await createUserWithEmailAndPassword(
+        auth,
+        newUser.email,
+        newUser.password
+      );
+      const { password, ...userData } = newUser;
+      await this.prismaService.user.create({
+        data: {
+          ...userData,
+          uid:  userCredentials.user.uid,
+          role: RoleTransformer(userData.role),
+        },
+      });
 
-    const createdUser = await this.prismaService.user.create({
-      data: { ...newUser, role: RoleTransformer(newUser.role) },
-    });
+      token = await userCredentials.user.getIdToken();
+    } catch (error) {
+      throw new BadRequestException({
+        message: `Error while registering: ${error}`,
+      });
+    }
 
-    return this.createToken(createdUser);
+    return { token };
   }
 
   async login(loginInfo: LoginRequest): Promise<{ token: string }> {
-    const user = await this.validateUser(loginInfo.email, loginInfo.password);
-
-    if (!user) {
+    const auth = getAuth(firebaseApp);
+    let userCredentials: UserCredential;
+    let token: string;
+    try {
+      userCredentials = await signInWithEmailAndPassword(
+        auth,
+        loginInfo.email,
+        loginInfo.password
+      );
+      token = await userCredentials.user.getIdToken();
+    } catch (error) {
       throw new BadRequestException({
         message: 'Invalid Credentials',
       });
     }
 
-    return this.createToken(user);
+    return { token };
   }
 
-  createToken(user: User): { token: string } {
-    const payload = {
-      email: user.email,
-      sub:   user.id,
-    };
-
-    return {
-      token: this.jwtService.sign(payload),
-    };
-  }
-
-  async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.userService.getUserByEmail(email);
-    if (!user) {
-      return null;
+  async logout(): Promise<void> {
+    const auth = getAuth(firebaseApp);
+    try {
+      await signOut(auth);
+    } catch (error) {
+      throw new BadRequestException({
+        message: `Error while logging out: ${error}`,
+      });
     }
-    const isValidPassword = await compare(password, user.password);
-    return isValidPassword ? user : null;
   }
 
   validateUserByToken(token: string): Promise<User | null> {

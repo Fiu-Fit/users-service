@@ -36,6 +36,12 @@ export class AuthController {
   }
 
   @GrpcMethod(AUTH_SERVICE_NAME)
+  @Post('logout')
+  logout() {
+    return this.authService.logout();
+  }
+
+  @GrpcMethod(AUTH_SERVICE_NAME)
   @Post('validate')
   async validate(request: Token): Promise<ValidResponse> {
     const user = await this.authService.validateUserByToken(request.token);
