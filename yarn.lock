@@ -877,7 +877,7 @@
 
 "@fiu-fit/common@ssh://git@github.com:Fiu-Fit/common.git":
   version "1.0.0"
-  resolved "ssh://git@github.com:Fiu-Fit/common.git#2f78cca6a53d5c330be62eaca298cd4ebdbd82d6"
+  resolved "ssh://git@github.com:Fiu-Fit/common.git#ce11d6091ff465851c275abe28d724cb33305b02"
   dependencies:
     winston "^3.8.2"
 

@@ -17,6 +17,8 @@ export interface ValidResponse {
   userId: number;
 }
 
+export interface Empty {}
+
 export interface Token {
   token: string;
 }
@@ -41,9 +43,9 @@ export interface AuthServiceClient {
 
   login(request: LoginRequest): Observable<Token>;
 
-  logout(): any;
-
   validate(request: Token): Observable<ValidResponse>;
+
+  logout(request: Empty): Observable<Empty>;
 }
 
 export interface AuthServiceController {
@@ -56,11 +58,13 @@ export interface AuthServiceController {
   validate(
     request: Token
   ): Promise<ValidResponse> | Observable<ValidResponse> | ValidResponse;
+
+  logout(request: Empty): Promise<Empty> | Observable<Empty> | Empty;
 }
 
 export function AuthServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['register', 'login', 'validate'];
+    const grpcMethods: string[] = ['register', 'login', 'validate', 'logout'];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(
         constructor.prototype,
