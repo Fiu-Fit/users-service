@@ -1,5 +1,5 @@
-import { Body, Controller, HttpStatus, Inject, Post } from '@nestjs/common';
-import { ClientGrpc, GrpcMethod } from '@nestjs/microservices';
+import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
 import { UnauthorizedException } from '../../shared/rpc-exceptions/UnauthenticatedException';
 import { AuthService } from './auth.service';
 import {
@@ -12,10 +12,7 @@ import {
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    @Inject('AUTH_PACKAGE') private readonly client: ClientGrpc
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @GrpcMethod(AUTH_SERVICE_NAME)
   @Post('register')
