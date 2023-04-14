@@ -1,6 +1,6 @@
 import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
-import { UnauthorizedException } from '../../shared/rpc-exceptions/UnauthenticatedException';
+import { UnauthorizedException } from '../../shared/rpc-exceptions';
 import { AuthService } from './auth.service';
 import {
   AUTH_SERVICE_NAME,

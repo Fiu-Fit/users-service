@@ -2,7 +2,7 @@ import { Page } from '@fiu-fit/common';
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { User } from '@prisma/client';
-import { NotFoundException } from '../../shared/rpc-exceptions/NotFoundException';
+import { NotFoundException } from '../../shared/rpc-exceptions';
 import { USER_SERVICE_NAME, UserId } from './interfaces/user.pb';
 import { UserDTO } from './user.dto';
 import { UserService } from './user.service';
