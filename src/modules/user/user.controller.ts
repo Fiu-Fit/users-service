@@ -1,59 +1,52 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  NotFoundException,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Put,
-  UseGuards,
-} from '@nestjs/common';
+import { Page } from '@fiu-fit/common';
+import { Controller } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
 import { User } from '@prisma/client';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth-guard';
-import { UserDto } from './user.dto';
+import { NotFoundException } from '../../shared/rpc-exceptions/NotFoundException';
+import { USER_SERVICE_NAME, UserId } from './interfaces/user.pb';
+import { UserDTO } from './user.dto';
 import { UserService } from './user.service';
 
-@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get(':id')
-  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    const user = await this.userService.getUserById(id);
+  @GrpcMethod(USER_SERVICE_NAME, 'FindById')
+  async getUserById(data: UserId): Promise<User | null> {
+    const user = await this.userService.getUserById(data?.id);
+
     if (!user) {
-      throw new NotFoundException({
-        message: 'Usuario con el id proveido no fue encontrado',
-      });
+      throw new NotFoundException('User not found');
     }
-    return user;
+
+    return this.userService.getUserById(data?.id);
   }
 
-  @Get()
-  getUsers(): Promise<User[]> {
-    return this.userService.getUsers();
+  @GrpcMethod(USER_SERVICE_NAME, 'FindAll')
+  getUsers(): Promise<Page<User>> {
+    return this.userService.findAndCount();
   }
 
-  @Patch(':id')
-  editUser(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() user: Partial<UserDto>
-  ): Promise<User> {
-    return this.userService.editUser(id, user);
+  @GrpcMethod(USER_SERVICE_NAME, 'Put')
+  async putEditUser(user: UserDTO): Promise<User> {
+    const editedUser = await this.userService.editUser(user?.id, user);
+
+    if (!editedUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    return editedUser;
   }
 
-  @Put(':id')
-  putEditUser(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() user: UserDto
-  ): Promise<User> {
-    return this.userService.editUser(id, user);
-  }
-
-  @Delete(':id')
-  deleteUser(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    return this.userService.deleteUser(id);
+  @GrpcMethod(USER_SERVICE_NAME, 'DeleteById')
+  async deleteUser(data: UserId): Promise<User | undefined> {
+    try {
+      return await this.userService.deleteUser(data?.id);
+    } catch (e) {
+      if ((e as any)?.code === 'P2025') {
+        throw new NotFoundException('User not found');
+      }
+      throw e;
+    }
   }
 }

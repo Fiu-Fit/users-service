@@ -19,7 +19,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start:dev": "yarn db:dev:up && nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "test": "dotenv -e .env.test -- jest",
@@ -31,30 +31,42 @@
     "postinstall": "yarn husky install",
     "lint:prettier": "prettier --config .prettierrc.json --ignore-path .prettierignore --write",
     "lint:eslint": "eslint --fix -c .eslintrc.json --ignore-path .eslintignore",
-    "lint": "yarn run lint:prettier && yarn run lint:eslint"
+    "lint": "yarn run lint:prettier && yarn run lint:eslint",
+    "common:install": "yarn add ssh://git@github.com:Fiu-Fit/common.git && yarn",
+    "proto:user": "npx protoc --plugin=node_modules/.bin/protoc-gen-ts_proto -I=./node_modules/@fiu-fit/common/src/protos --ts_proto_out=src/modules/user/interfaces/ node_modules/@fiu-fit/common/src/protos/user.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
+    "proto:auth": "npx protoc --plugin=node_modules/.bin/protoc-gen-ts_proto -I=./node_modules/@fiu-fit/common/src/protos --ts_proto_out=src/modules/auth/interfaces/ node_modules/@fiu-fit/common/src/protos/auth.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
+    "proto:all": "yarn run common:install && yarn run proto:user && yarn run proto:auth",
+    "proto:user:win": "npx protoc --plugin=node_modules/.bin/protoc-gen-ts_proto.cmd -I=./node_modules/@fiu-fit/common/src/protos --ts_proto_out=src/modules/user/interfaces/ node_modules/@fiu-fit/common/src/protos/user.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
+    "proto:auth:win": "npx protoc --plugin=node_modules/.bin/protoc-gen-ts_proto.cmd -I=./node_modules/@fiu-fit/common/src/protos --ts_proto_out=src/modules/auth/interfaces/ node_modules/@fiu-fit/common/src/protos/auth.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
+    "proto:all:win": "yarn run common:install && yarn run proto:user:win && yarn run proto:auth:win"
   },
   "prisma": {
     "seed": "ts-node ./prisma/seeder.ts"
   },
   "dependencies": {
     "@angular-devkit/core": "15.2.3",
+    "@fiu-fit/common": "ssh://git@github.com:Fiu-Fit/common.git",
+    "@grpc/grpc-js": "^1.8.13",
+    "@grpc/proto-loader": "^0.7.6",
     "@nestjs/common": "^9.3.12",
+    "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.3.12",
     "@nestjs/jwt": "^10.0.3",
-    "@nestjs/passport": "^9.0.3",
+    "@nestjs/microservices": "^9.3.12",
     "@nestjs/platform-express": "^9.3.12",
     "@prisma/client": "^4.12.0",
     "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "express": "^4.18.2",
-    "husky": "^8.0.3",
-    "passport": "^0.6.0",
-    "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0",
+    "firebase": "^9.19.1",
+    "firebase-admin": "^11.6.0",
+    "husky": "^7.0.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^4.4.1",
-    "rxjs": "^7.8.0"
+    "rxjs": "^7.8.0",
+    "ts-proto": "^1.146.0",
+    "winston": "^3.8.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.3.0",
@@ -67,11 +79,9 @@
     "@types/multer": "^1.4.7",
     "@types/node": "^18.15.11",
     "@types/passport-jwt": "^3.0.8",
-    "@types/passport-local": "^1.0.35",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
-    "dotenv-cli": "^7.1.0",
     "esbuild": "^0.17.14",
     "eslint": "^8.37.0",
     "eslint-config-prettier": "^8.8.0",
@@ -106,5 +116,11 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx}": [
+      "npx prettier --write",
+      "npx eslint --fix"
+    ]
   }
 }

@@ -75,7 +75,7 @@
     ],
     "no-shadow": "off",
     "@typescript-eslint/no-shadow": [
-      "error"
+      "warn"
     ],
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": [
@@ -85,6 +85,7 @@
         "ignoreRestSiblings": true
       }
     ],
+    "no-console": "error",
     "quotes": "off",
     "@typescript-eslint/quotes": [
       "error",
@@ -113,7 +114,9 @@
     "import/no-extraneous-dependencies": [
       "warn",
       {
-        "devDependencies": false
+        "devDependencies": false,
+        "optionalDependencies": false,
+        "peerDependencies": false
       }
     ],
     "import/order": [

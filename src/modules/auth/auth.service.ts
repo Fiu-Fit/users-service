@@ -1,10 +1,20 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Role, User } from '@prisma/client';
-import { compare, genSaltSync, hashSync } from 'bcrypt';
+import {
+  UserCredential,
+  createUserWithEmailAndPassword,
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth';
 import { PrismaService } from '../../prisma.service';
-import { UserDto } from '../user/user.dto';
+import { RoleTransformer } from '../../shared/RoleTransformer';
+import { InvalidArgumentException } from '../../shared/rpc-exceptions/InvalidArgumentException';
 import { UserService } from '../user/user.service';
+import { firebaseApp } from './firebase';
+import { JwtPayload } from './interfaces/auth.interface';
+import { LoginRequest, RegisterRequest } from './interfaces/auth.pb';
 
 @Injectable()
 export class AuthService {
@@ -14,52 +24,76 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async validateNewUser(user: UserDto): Promise<void> {
-    if (await this.userService.getUserByEmail(user.email)) {
+  validateNewUser(user: RegisterRequest): void {
+    if (!Object.values(Role).includes(RoleTransformer(user.role))) {
+      throw new InvalidArgumentException('Invalid Role');
+    }
+  }
+
+  async register(newUser: RegisterRequest): Promise<{ token: string }> {
+    this.validateNewUser(newUser);
+
+    const auth = getAuth(firebaseApp);
+    let userCredentials: UserCredential;
+    let token: string;
+    try {
+      userCredentials = await createUserWithEmailAndPassword(
+        auth,
+        newUser.email,
+        newUser.password
+      );
+      const { password, ...userData } = newUser;
+      await this.prismaService.user.create({
+        data: {
+          ...userData,
+          uid:  userCredentials.user.uid,
+          role: RoleTransformer(userData.role),
+        },
+      });
+
+      token = await userCredentials.user.getIdToken();
+    } catch (error) {
       throw new BadRequestException({
-        message: 'Email esta en uso',
+        message: `Error while registering: ${error}`,
       });
     }
 
-    if (!Object.values(Role).includes(user.role)) {
+    return { token };
+  }
+
+  async login(loginInfo: LoginRequest): Promise<{ token: string }> {
+    const auth = getAuth(firebaseApp);
+    let userCredentials: UserCredential;
+    let token: string;
+    try {
+      userCredentials = await signInWithEmailAndPassword(
+        auth,
+        loginInfo.email,
+        loginInfo.password
+      );
+      token = await userCredentials.user.getIdToken();
+    } catch (error) {
       throw new BadRequestException({
-        message: 'Rol no valido',
+        message: 'Invalid Credentials',
+      });
+    }
+
+    return { token };
+  }
+
+  async logout(): Promise<void> {
+    const auth = getAuth(firebaseApp);
+    try {
+      await signOut(auth);
+    } catch (error) {
+      throw new BadRequestException({
+        message: `Error while logging out: ${error}`,
       });
     }
   }
 
-  async signUpUser(user: UserDto): Promise<{ token: string }> {
-    await this.validateNewUser(user);
-
-    const salt = genSaltSync(Number(process.env.SALT_ROUNDS));
-    user.password = hashSync(user.password, salt);
-
-    const createdUser = await this.prismaService.user.create({ data: user });
-
-    return this.createToken(createdUser);
-  }
-
-  loginUser(user: User): { token: string } {
-    return this.createToken(user);
-  }
-
-  createToken(user: User): { token: string } {
-    const payload = {
-      email: user.email,
-      sub:   user.id,
-    };
-
-    return {
-      token: this.jwtService.sign(payload),
-    };
-  }
-
-  async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.userService.getUserByEmail(email);
-    if (!user) {
-      return null;
-    }
-    const isValidPassword = await compare(password, user.password);
-    return isValidPassword ? user : null;
+  validateUserByToken(token: string): Promise<User | null> {
+    const payload = this.jwtService.verify<JwtPayload>(token);
+    return this.userService.getUserByEmail(payload.email);
   }
 }
