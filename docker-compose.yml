@@ -1,6 +1,6 @@
-version: '3.8'
+version: "3.9"
 services:
-  dev-db:
+  db:
     image: postgres
     ports:
       - 5434:5432
