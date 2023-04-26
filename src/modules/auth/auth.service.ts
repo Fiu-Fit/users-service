@@ -11,8 +11,10 @@ import {
 import * as admin from 'firebase-admin';
 import { PrismaService } from '../../prisma.service';
 import { RoleTransformer } from '../../shared/RoleTransformer';
-import { InvalidArgumentException } from '../../shared/rpc-exceptions/InvalidArgumentException';
-import { UnauthorizedException } from '../../shared/rpc-exceptions/UnauthenticatedException';
+import {
+  AlreadyExistsException,
+  InvalidArgumentException,
+} from '../../shared/rpc-exceptions';
 import { UserService } from '../user/user.service';
 import { firebaseApp } from './firebase';
 import { LoginRequest, RegisterRequest } from './interfaces/auth.pb';
@@ -53,10 +55,19 @@ export class AuthService {
       });
 
       token = await userCredentials.user.getIdToken();
-    } catch (error) {
-      throw new BadRequestException({
-        message: `Error while registering: ${error}`,
-      });
+    } catch (error: any) {
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          throw new AlreadyExistsException('Email already in use');
+        case 'auth/invalid-email':
+          throw new InvalidArgumentException('Invalid email');
+        case 'auth/weak-password':
+          throw new InvalidArgumentException('Weak password');
+        default:
+          throw new BadRequestException({
+            message: `Error while registering: ${error}`,
+          });
+      }
     }
 
     return { token };
