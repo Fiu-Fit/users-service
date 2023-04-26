@@ -44,7 +44,7 @@
     "seed": "ts-node ./prisma/seeder.ts"
   },
   "dependencies": {
-    "@fiu-fit/common": "ssh://git@github.com:Fiu-Fit/common.git",
+    "@fiu-fit/common": "https://github.com/Fiu-Fit/common.git",
     "@grpc/grpc-js": "^1.8.13",
     "@grpc/proto-loader": "^0.7.6",
     "@nestjs/common": "^9.3.12",
@@ -60,7 +60,7 @@
     "express": "^4.18.2",
     "firebase": "^9.19.1",
     "firebase-admin": "^11.6.0",
-    "husky": "^7.0.2",
+    "husky": "^8.0.3",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^4.4.1",
     "rxjs": "^7.8.0",
@@ -81,6 +81,7 @@
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
+    "dotenv-cli": "^7.2.1",
     "esbuild": "^0.17.14",
     "eslint": "^8.37.0",
     "eslint-config-prettier": "^8.8.0",
