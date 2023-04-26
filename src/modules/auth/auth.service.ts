@@ -8,12 +8,13 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
+import * as admin from 'firebase-admin';
 import { PrismaService } from '../../prisma.service';
 import { RoleTransformer } from '../../shared/RoleTransformer';
 import { InvalidArgumentException } from '../../shared/rpc-exceptions/InvalidArgumentException';
+import { UnauthorizedException } from '../../shared/rpc-exceptions/UnauthenticatedException';
 import { UserService } from '../user/user.service';
 import { firebaseApp } from './firebase';
-import { JwtPayload } from './interfaces/auth.interface';
 import { LoginRequest, RegisterRequest } from './interfaces/auth.pb';
 
 @Injectable()
@@ -92,8 +93,15 @@ export class AuthService {
     }
   }
 
-  validateUserByToken(token: string): Promise<User | null> {
-    const payload = this.jwtService.verify<JwtPayload>(token);
-    return this.userService.getUserByEmail(payload.email);
+  async validateUserByToken(token: string): Promise<User | null> {
+    try {
+      const payload = await admin.auth().verifyIdToken(token);
+
+      if (!payload || !payload.email) return null;
+
+      return this.userService.getUserByEmail(payload.email!);
+    } catch (error) {
+      throw new UnauthorizedException('The token is invalid');
+    }
   }
 }
