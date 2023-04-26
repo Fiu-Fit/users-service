@@ -56,16 +56,17 @@ export class AuthService {
 
       token = await userCredentials.user.getIdToken();
     } catch (error: any) {
-      if (error.code === 'auth/email-already-in-use') {
-        throw new AlreadyExistsException('Email already in use');
-      } else if (error.code === 'auth/invalid-email') {
-        throw new InvalidArgumentException('Invalid email');
-      } else if (error.code === 'auth/weak-password') {
-        throw new InvalidArgumentException('Weak password');
-      } else {
-        throw new BadRequestException({
-          message: `Error while registering: ${error}`,
-        });
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          throw new AlreadyExistsException('Email already in use');
+        case 'auth/invalid-email':
+          throw new InvalidArgumentException('Invalid email');
+        case 'auth/weak-password':
+          throw new InvalidArgumentException('Weak password');
+        default:
+          throw new BadRequestException({
+            message: `Error while registering: ${error}`,
+          });
       }
     }
 
