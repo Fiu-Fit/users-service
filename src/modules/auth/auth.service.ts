@@ -14,6 +14,7 @@ import { RoleTransformer } from '../../shared/RoleTransformer';
 import {
   AlreadyExistsException,
   InvalidArgumentException,
+  UnauthorizedException,
 } from '../../shared/rpc-exceptions';
 import { UserService } from '../user/user.service';
 import { firebaseApp } from './firebase';
