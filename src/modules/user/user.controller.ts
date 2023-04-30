@@ -1,9 +1,8 @@
 import { Page } from '@fiu-fit/common';
-import { Controller } from '@nestjs/common';
-import { GrpcMethod } from '@nestjs/microservices';
+import { Controller, Delete, Get, Put } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { NotFoundException } from '../../shared/rpc-exceptions';
-import { USER_SERVICE_NAME, UserId } from './interfaces/user.pb';
+import { UserId } from './interfaces/user.pb';
 import { UserDTO } from './user.dto';
 import { UserService } from './user.service';
 
@@ -11,7 +10,7 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @GrpcMethod(USER_SERVICE_NAME, 'FindById')
+  @Get(':id')
   async getUserById(data: UserId): Promise<User | null> {
     const user = await this.userService.getUserById(data?.id);
 
@@ -22,12 +21,12 @@ export class UserController {
     return this.userService.getUserById(data?.id);
   }
 
-  @GrpcMethod(USER_SERVICE_NAME, 'FindAll')
+  @Get()
   getUsers(): Promise<Page<User>> {
     return this.userService.findAndCount();
   }
 
-  @GrpcMethod(USER_SERVICE_NAME, 'Put')
+  @Put(':id')
   async putEditUser(user: UserDTO): Promise<User> {
     const editedUser = await this.userService.editUser(user?.id, user);
 
@@ -38,7 +37,7 @@ export class UserController {
     return editedUser;
   }
 
-  @GrpcMethod(USER_SERVICE_NAME, 'DeleteById')
+  @Delete(':id')
   async deleteUser(data: UserId): Promise<User | undefined> {
     try {
       return await this.userService.deleteUser(data?.id);

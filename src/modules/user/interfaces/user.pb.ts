@@ -1,8 +1,5 @@
 /* eslint-disable */
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
-
-export const protobufPackage = 'user';
 
 export enum Role {
   Admin = 0,
@@ -30,8 +27,6 @@ export interface UserPages {
   count: number;
 }
 
-export const USER_PACKAGE_NAME = 'user';
-
 export interface UserServiceClient {
   findById(request: UserId): Observable<User>;
 
@@ -53,34 +48,3 @@ export interface UserServiceController {
 
   deleteById(request: UserId): Promise<User> | Observable<User> | User;
 }
-
-export function UserServiceControllerMethods() {
-  return function (constructor: Function) {
-    const grpcMethods: string[] = ['findById', 'findAll', 'put', 'deleteById'];
-    for (const method of grpcMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(
-        constructor.prototype,
-        method
-      );
-      GrpcMethod('UserService', method)(
-        constructor.prototype[method],
-        method,
-        descriptor
-      );
-    }
-    const grpcStreamMethods: string[] = [];
-    for (const method of grpcStreamMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(
-        constructor.prototype,
-        method
-      );
-      GrpcStreamMethod('UserService', method)(
-        constructor.prototype[method],
-        method,
-        descriptor
-      );
-    }
-  };
-}
-
-export const USER_SERVICE_NAME = 'UserService';
