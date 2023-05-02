@@ -12,13 +12,13 @@ admin.initializeApp({
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 const firebaseConfig = {
-  apiKey:            'AIzaSyDrazZyQNDhuOHPdPCnm-fSn0IjHhnHuBc',
-  authDomain:        'fiufit-e9664.firebaseapp.com',
-  projectId:         'fiufit-e9664',
-  storageBucket:     'fiufit-e9664.appspot.com',
-  messagingSenderId: '649565336432',
-  appId:             '1:649565336432:web:b21a90d3814a7b9d3195b5',
-  measurementId:     'G-0SBS847NRL',
+  apiKey:            process.env.FIREBASE_API_KEY,
+  authDomain:        process.env.FIREBASE_AUTH_DOMAIN,
+  projectId:         process.env.FIREBASE_PROJECT_ID,
+  storageBucket:     process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId:             process.env.FIREBASE_APP_ID,
+  measurementId:     process.env.FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase

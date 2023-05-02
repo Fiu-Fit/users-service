@@ -1,13 +1,15 @@
 import { Page } from '@fiu-fit/common';
 import {
   BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
+  Param,
+  ParseIntPipe,
   Put,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { UserId } from './interfaces/user.pb';
 import { UserDTO } from './user.dto';
 import { UserService } from './user.service';
 
@@ -16,14 +18,16 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get(':id')
-  async getUserById(data: UserId): Promise<User | null> {
-    const user = await this.userService.getUserById(data?.id);
+  async getUserById(
+    @Param('id', ParseIntPipe) id: number
+  ): Promise<User | null> {
+    const user = await this.userService.getUserById(id);
 
     if (!user) {
       throw new BadRequestException({ message: 'User not found' });
     }
 
-    return this.userService.getUserById(data?.id);
+    return user;
   }
 
   @Get()
@@ -32,8 +36,11 @@ export class UserController {
   }
 
   @Put(':id')
-  async putEditUser(user: UserDTO): Promise<User> {
-    const editedUser = await this.userService.editUser(user?.id, user);
+  async putEditUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() user: UserDTO
+  ): Promise<User> {
+    const editedUser = await this.userService.editUser(id, user);
 
     if (!editedUser) {
       throw new BadRequestException({ message: 'User not found' });
@@ -43,9 +50,11 @@ export class UserController {
   }
 
   @Delete(':id')
-  async deleteUser(data: UserId): Promise<User | undefined> {
+  async deleteUser(
+    @Param('id', ParseIntPipe) id: number
+  ): Promise<User | undefined> {
     try {
-      return await this.userService.deleteUser(data?.id);
+      return await this.userService.deleteUser(id);
     } catch (e) {
       if ((e as any)?.code === 'P2025') {
         throw new BadRequestException({ message: 'User not found' });

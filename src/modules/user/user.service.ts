@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Page } from '@fiu-fit/common';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
