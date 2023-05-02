@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Role, User } from '@prisma/client';
@@ -11,11 +12,6 @@ import {
 import * as admin from 'firebase-admin';
 import { PrismaService } from '../../prisma.service';
 import { RoleTransformer } from '../../shared/RoleTransformer';
-import {
-  AlreadyExistsException,
-  InvalidArgumentException,
-  UnauthorizedException,
-} from '../../shared/rpc-exceptions';
 import { UserService } from '../user/user.service';
 import { firebaseApp } from './firebase';
 import { LoginRequest, RegisterRequest } from './interfaces/auth.pb';
@@ -30,14 +26,13 @@ export class AuthService {
 
   validateNewUser(user: RegisterRequest): void {
     if (!Object.values(Role).includes(RoleTransformer(user.role))) {
-      throw new InvalidArgumentException('Invalid Role');
+      throw new BadRequestException({ message: 'Invalid role' });
     }
   }
 
   async register(newUser: RegisterRequest): Promise<{ token: string }> {
     this.validateNewUser(newUser);
-
-    const auth = getAuth(firebaseApp);
+    const auth = getAuth(firebaseApp); // Rompe acá
     let userCredentials: UserCredential;
     let token: string;
     try {
@@ -59,11 +54,13 @@ export class AuthService {
     } catch (error: any) {
       switch (error.code) {
         case 'auth/email-already-in-use':
-          throw new AlreadyExistsException('Email already in use');
+          throw new BadRequestException({
+            message: `Email already in use: ${error}`,
+          });
         case 'auth/invalid-email':
-          throw new InvalidArgumentException('Invalid email');
+          throw new BadRequestException({ message: `Invalid email: ${error}` });
         case 'auth/weak-password':
-          throw new InvalidArgumentException('Weak password');
+          throw new BadRequestException({ message: `Weak password: ${error}` });
         default:
           throw new BadRequestException({
             message: `Error while registering: ${error}`,
@@ -113,7 +110,9 @@ export class AuthService {
 
       return this.userService.getUserByEmail(payload.email!);
     } catch (error) {
-      throw new UnauthorizedException('The token is invalid');
+      throw new BadRequestException({
+        message: `The token is invalid: ${error}`,
+      });
     }
   }
 }

@@ -1,7 +1,12 @@
 import { Page } from '@fiu-fit/common';
-import { Controller, Delete, Get, Put } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Delete,
+  Get,
+  Put,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
-import { NotFoundException } from '../../shared/rpc-exceptions';
 import { UserId } from './interfaces/user.pb';
 import { UserDTO } from './user.dto';
 import { UserService } from './user.service';
@@ -15,7 +20,7 @@ export class UserController {
     const user = await this.userService.getUserById(data?.id);
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new BadRequestException({ message: 'User not found' });
     }
 
     return this.userService.getUserById(data?.id);
@@ -31,7 +36,7 @@ export class UserController {
     const editedUser = await this.userService.editUser(user?.id, user);
 
     if (!editedUser) {
-      throw new NotFoundException('User not found');
+      throw new BadRequestException({ message: 'User not found' });
     }
 
     return editedUser;
@@ -43,7 +48,7 @@ export class UserController {
       return await this.userService.deleteUser(data?.id);
     } catch (e) {
       if ((e as any)?.code === 'P2025') {
-        throw new NotFoundException('User not found');
+        throw new BadRequestException({ message: 'User not found' });
       }
       throw e;
     }

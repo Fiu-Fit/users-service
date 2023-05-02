@@ -1,5 +1,11 @@
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
-import { UnauthorizedException } from '../../shared/rpc-exceptions';
+/* eslint-disable no-console */
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  HttpStatus,
+  Post,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   LoginRequest,
@@ -37,7 +43,8 @@ export class AuthController {
   async validate(request: Token): Promise<ValidResponse> {
     const user = await this.authService.validateUserByToken(request.token);
 
-    if (!user) throw new UnauthorizedException('The token is invalid');
+    if (!user)
+      throw new BadRequestException({ message: 'The token is invalid' });
 
     return { status: HttpStatus.OK, errors: [], userId: user.id };
   }

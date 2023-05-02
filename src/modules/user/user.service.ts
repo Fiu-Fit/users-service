@@ -1,4 +1,5 @@
 import { Page } from '@fiu-fit/common';
+import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
@@ -7,7 +8,10 @@ import { UserDTO } from './user.dto';
 
 @Injectable()
 export class UserService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private http: HttpService
+  ) {}
 
   async findAndCount(): Promise<Page<User>> {
     return {
