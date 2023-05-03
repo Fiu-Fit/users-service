@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Role, User } from '@prisma/client';
 import {
   UserCredential,
@@ -20,8 +18,7 @@ import { LoginRequest, RegisterRequest } from './interfaces/auth.pb';
 export class AuthService {
   constructor(
     private prismaService: PrismaService,
-    private userService: UserService,
-    private jwtService: JwtService
+    private userService: UserService
   ) {}
 
   validateNewUser(user: RegisterRequest): void {
@@ -32,7 +29,7 @@ export class AuthService {
 
   async register(newUser: RegisterRequest): Promise<{ token: string }> {
     this.validateNewUser(newUser);
-    const auth = getAuth(firebaseApp); // Rompe acá
+    const auth = getAuth(firebaseApp);
     let userCredentials: UserCredential;
     let token: string;
     try {

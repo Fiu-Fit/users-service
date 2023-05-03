@@ -1,6 +1,4 @@
-import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma.service';
 import { UserModule } from '../user/user.module';
@@ -10,8 +8,6 @@ import { AuthService } from './auth.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    HttpModule,
     UserModule,
     JwtModule.register({
       secret:      process.env.JWT_PRIVATE_KEY,
