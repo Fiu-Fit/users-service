@@ -1,17 +1,10 @@
-import {
-  Body,
-  Controller,
-  HttpStatus,
-  Post,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   LoginRequest,
   RegisterRequest,
   Token,
-  ValidResponse,
-} from './interfaces/auth.pb';
+} from './interfaces/auth.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -39,12 +32,12 @@ export class AuthController {
   }
 
   @Post('validate')
-  async validate(request: Token): Promise<ValidResponse> {
+  async validate(@Body() request: Token): Promise<number> {
     const user = await this.authService.validateUserByToken(request.token);
 
     if (!user)
       throw new UnauthorizedException({ message: 'The token is invalid' });
 
-    return { status: HttpStatus.OK, errors: [], userId: user.id };
+    return user.id;
   }
 }
