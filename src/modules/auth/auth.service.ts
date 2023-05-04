@@ -15,9 +15,8 @@ import {
 import * as admin from 'firebase-admin';
 import { firebaseApp } from '../../firebase/firebase';
 import { PrismaService } from '../../prisma.service';
-import { RoleTransformer } from '../../shared/RoleTransformer';
 import { UserService } from '../user/user.service';
-import { LoginRequest, RegisterRequest } from './interfaces/auth.pb';
+import { LoginRequest, RegisterRequest } from './interfaces/auth.interface';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +26,7 @@ export class AuthService {
   ) {}
 
   validateNewUser(user: RegisterRequest): void {
-    if (!Object.values(Role).includes(RoleTransformer(user.role))) {
+    if (!Object.values(Role).includes(user.role)) {
       throw new BadRequestException({ message: 'Invalid role' });
     }
   }
@@ -48,7 +47,7 @@ export class AuthService {
         data: {
           ...userData,
           uid:  userCredentials.user.uid,
-          role: RoleTransformer(userData.role),
+          role: userData.role,
         },
       });
 
