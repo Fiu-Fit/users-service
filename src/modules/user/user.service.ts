@@ -3,7 +3,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { firebaseAdmin } from '../../firebase/firebase';
 import { PrismaService } from '../../prisma.service';
-import { RoleTransformer } from '../../shared/RoleTransformer';
 import { UserDTO } from './user.dto';
 
 @Injectable()
@@ -38,7 +37,7 @@ export class UserService {
       },
       data: {
         ...user,
-        role: RoleTransformer(user.role),
+        role: user.role,
       },
     });
   }
