@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Role, User } from '@prisma/client';
 import {
   UserCredential,
@@ -51,7 +56,7 @@ export class AuthService {
     } catch (error: any) {
       switch (error.code) {
         case 'auth/email-already-in-use':
-          throw new BadRequestException({
+          throw new ConflictException({
             message: `Email already in use: ${error}`,
           });
         case 'auth/invalid-email':
@@ -107,7 +112,7 @@ export class AuthService {
 
       return this.userService.getUserByEmail(payload.email!);
     } catch (error) {
-      throw new BadRequestException({
+      throw new UnauthorizedException({
         message: `The token is invalid: ${error}`,
       });
     }

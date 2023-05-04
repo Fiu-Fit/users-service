@@ -1,10 +1,10 @@
 import { Page } from '@fiu-fit/common';
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Put,
@@ -24,7 +24,7 @@ export class UserController {
     const user = await this.userService.getUserById(id);
 
     if (!user) {
-      throw new BadRequestException({ message: 'User not found' });
+      throw new NotFoundException({ message: 'User not found' });
     }
 
     return user;
@@ -43,7 +43,7 @@ export class UserController {
     const editedUser = await this.userService.editUser(id, user);
 
     if (!editedUser) {
-      throw new BadRequestException({ message: 'User not found' });
+      throw new NotFoundException({ message: 'User not found' });
     }
 
     return editedUser;
@@ -57,7 +57,7 @@ export class UserController {
       return await this.userService.deleteUser(id);
     } catch (e) {
       if ((e as any)?.code === 'P2025') {
-        throw new BadRequestException({ message: 'User not found' });
+        throw new NotFoundException({ message: 'User not found' });
       }
       throw e;
     }
