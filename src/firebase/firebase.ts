@@ -1,9 +1,9 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+import * as admin from 'firebase-admin';
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-export const firebaseParams = {
+const firebaseParams = {
   type:                    process.env.FIREBASE_TYPE as string,
   projectId:               process.env.FIREBASE_PROJECT_ID as string,
   privateKeyId:            process.env.FIREBASE_PRIVATE_KEY_ID as string,
@@ -16,6 +16,13 @@ export const firebaseParams = {
     .FIREBASE_AUTH_PROVIDER_X509_CERT_URL as string,
   clientX509CertUrl: process.env.FIREBASE_CLIENT_X509_CERT_URL as string,
 };
+
+export const firebaseAdmin = admin.initializeApp({
+  credential: admin.credential.cert(firebaseParams),
+});
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 const firebaseConfig = {
   apiKey:            process.env.FIREBASE_API_KEY,
