@@ -1,0 +1,7 @@
+FROM postgres
+
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=postgres
+ENV POSTGRES_DB=fiu-fit-users
+
+EXPOSE 5432/tcp
