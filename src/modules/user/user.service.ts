@@ -1,9 +1,15 @@
 import { Page } from '@fiu-fit/common';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
+import * as admin from 'firebase-admin';
+import { firebaseParams } from '../../firebase/firebase';
 import { PrismaService } from '../../prisma.service';
 import { RoleTransformer } from '../../shared/RoleTransformer';
 import { UserDTO } from './user.dto';
+
+admin.initializeApp({
+  credential: admin.credential.cert(firebaseParams),
+});
 
 @Injectable()
 export class UserService {
@@ -42,11 +48,23 @@ export class UserService {
     });
   }
 
-  deleteUser(id: number): Promise<User> {
-    return this.prismaService.user.delete({
-      where: {
-        id,
-      },
-    });
+  async deleteUser(id: number): Promise<User> {
+    const user = await this.prismaService.user
+      .findUnique({
+        where: {
+          id,
+        },
+      })
+      .catch(_ => {
+        throw new NotFoundException({ message: 'User not found' });
+      });
+
+    if (!user) {
+      throw new NotFoundException({ message: 'User not found' });
+    }
+
+    await admin.auth().deleteUser(user.uid);
+
+    return user;
   }
 }
