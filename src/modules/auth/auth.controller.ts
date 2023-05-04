@@ -1,9 +1,9 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   HttpStatus,
   Post,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
@@ -43,7 +43,7 @@ export class AuthController {
     const user = await this.authService.validateUserByToken(request.token);
 
     if (!user)
-      throw new BadRequestException({ message: 'The token is invalid' });
+      throw new UnauthorizedException({ message: 'The token is invalid' });
 
     return { status: HttpStatus.OK, errors: [], userId: user.id };
   }
