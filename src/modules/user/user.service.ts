@@ -45,7 +45,7 @@ export class UserService {
 
   async deleteUser(id: number): Promise<User> {
     const user = await this.prismaService.user
-      .findUnique({
+      .delete({
         where: {
           id,
         },
