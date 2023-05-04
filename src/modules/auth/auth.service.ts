@@ -13,10 +13,10 @@ import {
   signOut,
 } from 'firebase/auth';
 import * as admin from 'firebase-admin';
+import { firebaseApp } from '../../firebase/firebase';
 import { PrismaService } from '../../prisma.service';
 import { RoleTransformer } from '../../shared/RoleTransformer';
 import { UserService } from '../user/user.service';
-import { firebaseApp } from './firebase';
 import { LoginRequest, RegisterRequest } from './interfaces/auth.pb';
 
 @Injectable()
