@@ -1,9 +1,15 @@
 import { Page } from '@fiu-fit/common';
-import { Controller } from '@nestjs/common';
-import { GrpcMethod } from '@nestjs/microservices';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Put,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
-import { NotFoundException } from '../../shared/rpc-exceptions';
-import { USER_SERVICE_NAME, UserId } from './interfaces/user.pb';
 import { UserDTO } from './user.dto';
 import { UserService } from './user.service';
 
@@ -11,40 +17,47 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @GrpcMethod(USER_SERVICE_NAME, 'FindById')
-  async getUserById(data: UserId): Promise<User | null> {
-    const user = await this.userService.getUserById(data?.id);
+  @Get(':id')
+  async getUserById(
+    @Param('id', ParseIntPipe) id: number
+  ): Promise<User | null> {
+    const user = await this.userService.getUserById(id);
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException({ message: 'User not found' });
     }
 
-    return this.userService.getUserById(data?.id);
+    return user;
   }
 
-  @GrpcMethod(USER_SERVICE_NAME, 'FindAll')
+  @Get()
   getUsers(): Promise<Page<User>> {
     return this.userService.findAndCount();
   }
 
-  @GrpcMethod(USER_SERVICE_NAME, 'Put')
-  async putEditUser(user: UserDTO): Promise<User> {
-    const editedUser = await this.userService.editUser(user?.id, user);
+  @Put(':id')
+  async putEditUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() user: UserDTO
+  ): Promise<User> {
+    const editedUser = await this.userService.editUser(id, user);
 
     if (!editedUser) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException({ message: 'User not found' });
     }
 
     return editedUser;
   }
 
-  @GrpcMethod(USER_SERVICE_NAME, 'DeleteById')
-  async deleteUser(data: UserId): Promise<User | undefined> {
+  @Delete(':id')
+  async deleteUser(
+    @Param('id', ParseIntPipe) id: number
+  ): Promise<User | undefined> {
     try {
-      return await this.userService.deleteUser(data?.id);
+      return await this.userService.deleteUser(id);
     } catch (e) {
       if ((e as any)?.code === 'P2025') {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException({ message: 'User not found' });
       }
       throw e;
     }

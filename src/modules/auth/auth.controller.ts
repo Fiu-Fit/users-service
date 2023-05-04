@@ -1,9 +1,12 @@
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
-import { GrpcMethod } from '@nestjs/microservices';
-import { UnauthorizedException } from '../../shared/rpc-exceptions';
+import {
+  Body,
+  Controller,
+  HttpStatus,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
-  AUTH_SERVICE_NAME,
   LoginRequest,
   RegisterRequest,
   Token,
@@ -14,7 +17,6 @@ import {
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @GrpcMethod(AUTH_SERVICE_NAME)
   @Post('register')
   register(
     newUser: RegisterRequest,
@@ -23,7 +25,6 @@ export class AuthController {
     return this.authService.register(newUser || body);
   }
 
-  @GrpcMethod(AUTH_SERVICE_NAME)
   @Post('login')
   login(
     loginInfo: LoginRequest,
@@ -32,18 +33,17 @@ export class AuthController {
     return this.authService.login(loginInfo || body);
   }
 
-  @GrpcMethod(AUTH_SERVICE_NAME)
   @Post('logout')
   logout() {
     return this.authService.logout();
   }
 
-  @GrpcMethod(AUTH_SERVICE_NAME)
   @Post('validate')
   async validate(request: Token): Promise<ValidResponse> {
     const user = await this.authService.validateUserByToken(request.token);
 
-    if (!user) throw new UnauthorizedException('The token is invalid');
+    if (!user)
+      throw new UnauthorizedException({ message: 'The token is invalid' });
 
     return { status: HttpStatus.OK, errors: [], userId: user.id };
   }
