@@ -22,6 +22,11 @@ export class GoalController {
     return this.goalService.createGoal(goal);
   }
 
+  @Get()
+  getGoals(): Promise<Goal[]> {
+    return this.goalService.findAll();
+  }
+
   @Get(':id')
   async getGoalById(
     @Param('id', ParseIntPipe) id: number
@@ -33,11 +38,6 @@ export class GoalController {
     }
 
     return goal;
-  }
-
-  @Get()
-  getGoals(): Promise<Goal[]> {
-    return this.goalService.findAll();
   }
 
   @Put(':id')

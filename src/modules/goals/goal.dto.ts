@@ -6,6 +6,7 @@ export interface GoalDTO {
   description: string;
   metricId: number;
   metricStatus: MetricStatus;
-  expireDate?: Date;
+  userId: number;
+  deadline?: Date;
   updatedAt?: Date;
 }

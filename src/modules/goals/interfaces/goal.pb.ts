@@ -15,7 +15,8 @@ export interface Goal {
   description: string;
   metricId: number;
   metricStatus: MetricStatus;
-  expireDate?: Date;
+  userId: number;
+  deadline?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }
