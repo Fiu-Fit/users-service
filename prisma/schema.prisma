@@ -17,6 +17,7 @@ model User {
   firstName String @map("first_name")
   lastName  String @map("last_name")
   role      Role
+  goals     Goal[]
 }
 
 enum Role {
@@ -26,14 +27,16 @@ enum Role {
 }
 
 model Goal {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  metricId    Int
+  id           Int          @id @default(autoincrement())
+  title        String
+  description  String
+  metricId     Int
   metricStatus MetricStatus
-  expireDate  DateTime? 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime? @updatedAt
+  userId       Int
+  user         User         @relation(fields: [userId], references: [id])
+  expireDate   DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime?    @updatedAt
 }
 
 enum MetricStatus {
