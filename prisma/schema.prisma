@@ -34,7 +34,7 @@ model Goal {
   metricStatus MetricStatus
   userId       Int
   user         User         @relation(fields: [userId], references: [id])
-  expireDate   DateTime?
+  deadline     DateTime?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime?    @updatedAt
 }
