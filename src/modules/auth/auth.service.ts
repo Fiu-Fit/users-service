@@ -36,6 +36,7 @@ export class AuthService {
     const auth = getAuth(firebaseApp);
     let userCredentials: UserCredential;
     let token: string;
+
     try {
       userCredentials = await createUserWithEmailAndPassword(
         auth,
@@ -86,6 +87,33 @@ export class AuthService {
     } catch (error) {
       throw new BadRequestException({
         message: 'Invalid Credentials',
+      });
+    }
+
+    return { token };
+  }
+
+  async adminLogin(loginInfo: LoginRequest): Promise<{ token: string }> {
+    const auth = getAuth(firebaseApp);
+    let userCredentials: UserCredential;
+    let token: string;
+    try {
+      userCredentials = await signInWithEmailAndPassword(
+        auth,
+        loginInfo.email,
+        loginInfo.password
+      );
+      token = await userCredentials.user.getIdToken();
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Invalid Credentials',
+      });
+    }
+
+    const user = await this.userService.getUserByEmail(loginInfo.email);
+    if (!user || user.role !== Role.Admin) {
+      throw new UnauthorizedException({
+        message: 'You are not an admin',
       });
     }
 
