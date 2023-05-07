@@ -10,10 +10,10 @@ import {
   ParseIntPipe,
   Post,
   Put,
-  Query,
   UnauthorizedException,
+  Query
 } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { GetUsersQueryDTO } from './dto';
 import { UserDTO } from './dto/user.dto';
 import { UserService } from './user.service';
@@ -105,6 +105,12 @@ export class UserController {
 
   @Post()
   createUser(@Body() user: UserDTO): Promise<User> {
+    if (user.role === Role.Admin) {
+      throw new UnauthorizedException(
+        'No se puede crear un usuario administrador!'
+      );
+    }
+
     return this.userService.createUser(user);
   }
 }
