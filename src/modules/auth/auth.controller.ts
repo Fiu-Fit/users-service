@@ -5,14 +5,10 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { Role, User } from '@prisma/client';
+import { Role } from '@prisma/client';
 import { AdminGuard } from './admin.guard';
 import { AuthService } from './auth.service';
-import {
-  LoginRequest,
-  RegisterRequest,
-  Token,
-} from './interfaces/auth.interface';
+import { LoginRequest, RegisterRequest } from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -58,15 +54,5 @@ export class AuthController {
   @Post('logout')
   logout() {
     return this.authService.logout();
-  }
-
-  @Post('validate')
-  async validate(@Body() request: Token): Promise<User> {
-    const user = await this.authService.validateUserByToken(request.token);
-
-    if (!user)
-      throw new UnauthorizedException({ message: 'The token is invalid' });
-
-    return user;
   }
 }
