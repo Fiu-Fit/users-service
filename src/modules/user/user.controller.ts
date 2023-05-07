@@ -8,6 +8,7 @@ import {
   Param,
   ParseIntPipe,
   Put,
+  Query,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { UserDTO } from './user.dto';
@@ -33,6 +34,16 @@ export class UserController {
   @Get()
   getUsers(): Promise<Page<User>> {
     return this.userService.findAndCount();
+  }
+
+  @Get('search')
+  async searchUsers(@Query('query') query: string): Promise<User[]> {
+    const searchResults = await this.userService.searchUsers(query);
+
+    if (searchResults.length === 0) {
+      throw new NotFoundException({ message: 'No users found' });
+    }
+    return searchResults;
   }
 
   @Put(':id')
