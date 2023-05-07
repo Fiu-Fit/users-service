@@ -8,9 +8,11 @@ import {
   Param,
   ParseIntPipe,
   Put,
+  Query,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { UserDTO } from './user.dto';
+import { GetUsersQueryDTO } from './dto';
+import { UserDTO } from './dto/user.dto';
 import { UserService } from './user.service';
 
 @Controller('users')
@@ -31,8 +33,8 @@ export class UserController {
   }
 
   @Get()
-  getUsers(): Promise<Page<User>> {
-    return this.userService.findAndCount();
+  getUsers(@Query() filter: GetUsersQueryDTO): Promise<Page<User>> {
+    return this.userService.findAndCount(filter);
   }
 
   @Put(':id')

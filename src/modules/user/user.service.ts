@@ -3,18 +3,25 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { firebaseAdmin } from '../../firebase/firebase';
 import { PrismaService } from '../../prisma.service';
-import { UserDTO } from './user.dto';
+import { GetUsersQueryDTO, UserDTO } from './dto';
 
 @Injectable()
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  async findAndCount(): Promise<Page<User>> {
+  async findAndCount(filter: GetUsersQueryDTO): Promise<Page<User>> {
+    const rows = await this.prismaService.user.findMany({
+      orderBy: { id: 'asc' },
+      where:   {
+        id: {
+          in: filter.ids,
+        },
+      },
+    });
+
     return {
-      rows: await this.prismaService.user.findMany({
-        orderBy: { id: 'asc' },
-      }),
-      count: await this.prismaService.user.count(),
+      rows:  rows,
+      count: rows.length,
     };
   }
 
