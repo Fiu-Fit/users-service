@@ -39,7 +39,7 @@ export class AdminGuard implements CanActivate {
       });
 
     const user = await this.prisma.user.findUnique({
-      where: { email: email },
+      where: { email },
     });
 
     if (!user || user.role !== Role.Admin) {
