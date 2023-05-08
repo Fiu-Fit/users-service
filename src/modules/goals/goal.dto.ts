@@ -1,12 +1,39 @@
-import { MetricStatus } from '@prisma/client';
+import { Category, GoalStatus } from '@prisma/client';
+import {
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
-export interface GoalDTO {
-  id: number;
+export class GoalDTO {
+  @IsString()
+  @MaxLength(30)
   title: string;
+
+  @IsString()
+  @MaxLength(100)
   description: string;
-  metricId: number;
-  metricStatus: MetricStatus;
+
+  @IsNumber()
   userId: number;
-  deadline?: Date;
-  updatedAt?: Date;
+
+  @IsNumber()
+  targetValue: number;
+
+  @IsOptional()
+  actualValue: number;
+
+  @IsOptional()
+  deadline: Date;
+
+  @IsOptional()
+  updatedAt: Date;
+
+  @IsEnum(Category)
+  category: Category;
+
+  @IsEnum(GoalStatus)
+  status: GoalStatus;
 }
