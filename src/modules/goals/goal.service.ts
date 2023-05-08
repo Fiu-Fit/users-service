@@ -8,11 +8,7 @@ export class GoalService {
   constructor(private prismaService: PrismaService) {}
 
   async createGoal(goal: GoalDTO): Promise<Goal> {
-    const createdGoal = await this.prismaService.goal.create({
-      data: {
-        ...goal,
-      },
-    });
+    const createdGoal = await this.prismaService.goal.create({ data: goal });
     return createdGoal;
   }
 
@@ -28,12 +24,8 @@ export class GoalService {
 
   editGoal(id: number, goal: GoalDTO): Promise<Goal> {
     return this.prismaService.goal.update({
-      where: {
-        id,
-      },
-      data: {
-        ...goal,
-      },
+      where: { id },
+      data:  goal,
     });
   }
 
