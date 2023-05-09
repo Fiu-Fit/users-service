@@ -4,14 +4,18 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   NotFoundException,
   Param,
   ParseIntPipe,
+  Post,
   Put,
   Query,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { UserDTO } from './user.dto';
+import { GetUsersQueryDTO } from './dto';
+import { UserDTO } from './dto/user.dto';
 import { UserService } from './user.service';
 
 @Controller('users')
@@ -32,8 +36,8 @@ export class UserController {
   }
 
   @Get()
-  getUsers(): Promise<Page<User>> {
-    return this.userService.findAndCount();
+  getUsers(@Query() filter: GetUsersQueryDTO): Promise<Page<User>> {
+    return this.userService.findAndCount(filter);
   }
 
   @Get('search')
@@ -72,5 +76,17 @@ export class UserController {
       }
       throw e;
     }
+  }
+
+  @Post('me')
+  async getUserByToken(
+    @Headers('Authorization') bearerToken: string
+  ): Promise<User> {
+    const user = await this.userService.getUserByToken(bearerToken);
+
+    if (!user)
+      throw new UnauthorizedException({ message: 'The token is invalid' });
+
+    return user;
   }
 }
