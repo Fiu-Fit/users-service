@@ -15,40 +15,28 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  register(
-    newUser: RegisterRequest,
-    @Body() body: RegisterRequest
-  ): Promise<{ token: string }> {
-    if (body.role === Role.Admin)
+  register(@Body() newUser: RegisterRequest): Promise<{ token: string }> {
+    if (newUser.role === Role.Admin)
       throw new UnauthorizedException({
         message: 'Use /admin/register to register an admin',
       });
-    return this.authService.register(newUser || body);
+    return this.authService.register(newUser);
   }
 
   @Post('login')
-  login(
-    loginInfo: LoginRequest,
-    @Body() body: LoginRequest
-  ): Promise<{ token: string }> {
-    return this.authService.login(loginInfo || body);
+  login(@Body() loginInfo: LoginRequest): Promise<{ token: string }> {
+    return this.authService.login(loginInfo);
   }
 
   @UseGuards(AdminGuard)
   @Post('admin/register')
-  adminRegister(
-    newUser: RegisterRequest,
-    @Body() body: RegisterRequest
-  ): Promise<{ token: string }> {
-    return this.authService.register(newUser || body);
+  adminRegister(@Body() newUser: RegisterRequest): Promise<{ token: string }> {
+    return this.authService.register(newUser);
   }
 
   @Post('admin/login')
-  adminLogin(
-    loginInfo: LoginRequest,
-    @Body() body: LoginRequest
-  ): Promise<{ token: string }> {
-    return this.authService.adminLogin(loginInfo || body);
+  adminLogin(@Body() loginInfo: LoginRequest): Promise<{ token: string }> {
+    return this.authService.adminLogin(loginInfo);
   }
 
   @Post('logout')
