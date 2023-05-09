@@ -10,18 +10,22 @@ export class UserService {
   constructor(private prismaService: PrismaService) {}
 
   async findAndCount(filter: GetUsersQueryDTO): Promise<Page<User>> {
-    const rows = await this.prismaService.user.findMany({
-      orderBy: { id: 'asc' },
-      where:   {
-        id: {
-          in: filter.ids,
-        },
-      },
-    });
-
     return {
-      rows:  rows,
-      count: rows.length,
+      rows: await this.prismaService.user.findMany({
+        orderBy: { id: 'asc' },
+        where:   {
+          id: {
+            in: filter.ids,
+          },
+        },
+      }),
+      count: await this.prismaService.user.count({
+        where: {
+          id: {
+            in: filter.ids,
+          },
+        },
+      }),
     };
   }
 

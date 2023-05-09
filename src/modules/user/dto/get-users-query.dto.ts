@@ -1,7 +1,8 @@
 import { Transform } from 'class-transformer';
-import { IsArray, IsInt } from 'class-validator';
+import { IsArray, IsInt, IsOptional } from 'class-validator';
 
 export class GetUsersQueryDTO {
+  @IsOptional()
   @IsArray()
   @IsInt({ each: true })
   @Transform(({ value }) =>
@@ -11,6 +12,4 @@ export class GetUsersQueryDTO {
       .map((id: string) => Number(id))
   )
   ids?: number[];
-
-  message?: string;
 }
