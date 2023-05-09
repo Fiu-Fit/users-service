@@ -8,18 +8,29 @@ import { User } from '@prisma/client';
 import * as admin from 'firebase-admin';
 import { firebaseAdmin } from '../../firebase/firebase';
 import { PrismaService } from '../../prisma.service';
-import { UserDTO } from './user.dto';
+import { GetUsersQueryDTO, UserDTO } from './dto';
 
 @Injectable()
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  async findAndCount(): Promise<Page<User>> {
+  async findAndCount(filter: GetUsersQueryDTO): Promise<Page<User>> {
     return {
       rows: await this.prismaService.user.findMany({
         orderBy: { id: 'asc' },
+        where:   {
+          id: {
+            in: filter.ids,
+          },
+        },
       }),
-      count: await this.prismaService.user.count(),
+      count: await this.prismaService.user.count({
+        where: {
+          id: {
+            in: filter.ids,
+          },
+        },
+      }),
     };
   }
 
