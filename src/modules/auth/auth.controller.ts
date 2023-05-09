@@ -1,43 +1,46 @@
-import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from './auth.service';
 import {
-  LoginRequest,
-  RegisterRequest,
-  Token,
-} from './interfaces/auth.interface';
+  Body,
+  Controller,
+  Post,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
+import { Role } from '@prisma/client';
+import { AdminGuard } from './admin.guard';
+import { AuthService } from './auth.service';
+import { LoginRequest, RegisterRequest } from './dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  register(
-    newUser: RegisterRequest,
-    @Body() body: RegisterRequest
-  ): Promise<{ token: string }> {
-    return this.authService.register(newUser || body);
+  register(@Body() newUser: RegisterRequest): Promise<{ token: string }> {
+    if (newUser.role === Role.Admin)
+      throw new UnauthorizedException({
+        message: 'Use /admin/register to register an admin',
+      });
+    return this.authService.register(newUser);
   }
 
   @Post('login')
-  login(
-    loginInfo: LoginRequest,
-    @Body() body: LoginRequest
-  ): Promise<{ token: string }> {
-    return this.authService.login(loginInfo || body);
+  login(@Body() loginInfo: LoginRequest): Promise<{ token: string }> {
+    return this.authService.login(loginInfo);
+  }
+
+  @UseGuards(AdminGuard)
+  @Post('admin/register')
+  adminRegister(@Body() newUser: RegisterRequest): Promise<{ token: string }> {
+    return this.authService.register(newUser);
+  }
+
+  @Post('admin/login')
+  adminLogin(@Body() loginInfo: LoginRequest): Promise<{ token: string }> {
+    return this.authService.adminLogin(loginInfo);
   }
 
   @Post('logout')
   logout() {
     return this.authService.logout();
-  }
-
-  @Post('validate')
-  async validate(@Body() request: Token): Promise<number> {
-    const user = await this.authService.validateUserByToken(request.token);
-
-    if (!user)
-      throw new UnauthorizedException({ message: 'The token is invalid' });
-
-    return user.id;
   }
 }

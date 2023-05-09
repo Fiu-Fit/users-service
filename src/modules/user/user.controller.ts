@@ -4,10 +4,13 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   NotFoundException,
   Param,
   ParseIntPipe,
+  Post,
   Put,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { UserDTO } from './user.dto';
@@ -61,5 +64,17 @@ export class UserController {
       }
       throw e;
     }
+  }
+
+  @Post('me')
+  async getUserByToken(
+    @Headers('Authorization') bearerToken: string
+  ): Promise<User> {
+    const user = await this.userService.getUserByToken(bearerToken);
+
+    if (!user)
+      throw new UnauthorizedException({ message: 'The token is invalid' });
+
+    return user;
   }
 }
