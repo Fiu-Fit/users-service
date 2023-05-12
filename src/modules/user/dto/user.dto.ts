@@ -6,4 +6,5 @@ export interface UserDTO {
   lastName: string;
   email: string;
   role: Role;
+  bodyWeight: number;
 }

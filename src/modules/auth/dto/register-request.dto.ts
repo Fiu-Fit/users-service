@@ -30,5 +30,5 @@ export class RegisterRequest {
 
   @IsNumber()
   @IsPositive()
-  weight: number;
+  bodyWeight: number;
 }
