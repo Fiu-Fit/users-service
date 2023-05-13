@@ -19,7 +19,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start:dev": "yarn db:dev:up && nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "yarn prisma migrate deploy && nest start",
     "test": "dotenv -e .env.test -- jest",
