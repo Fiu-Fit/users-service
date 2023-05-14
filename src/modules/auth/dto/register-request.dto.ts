@@ -1,9 +1,9 @@
 import { Role } from '@prisma/client';
+import { Type } from 'class-transformer';
 import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsPositive,
   IsString,
 } from 'class-validator';
@@ -28,7 +28,7 @@ export class RegisterRequest {
   @IsEnum(Role)
   role: Role;
 
-  @IsNumber()
+  @Type(() => Number)
   @IsPositive()
   bodyWeight: number;
 }
