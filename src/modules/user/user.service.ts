@@ -4,7 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import * as admin from 'firebase-admin';
 import { firebaseAdmin } from '../../firebase/firebase';
 import { PrismaService } from '../../prisma.service';
@@ -14,23 +14,32 @@ import { GetUsersQueryDTO, UserDTO } from './dto';
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  async findAndCount(filter: GetUsersQueryDTO): Promise<Page<User>> {
+  async findAndCount(this: any, filter: GetUsersQueryDTO): Promise<Page<User>> {
+    const where: Prisma.UserWhereInput = {
+      id: {
+        in: filter.ids,
+      },
+      AND: [],
+    };
+    const filterArray: any[] = [];
+    for (const key in filter) {
+      if (key !== 'ids' && filter[key]) {
+        const field = key as keyof Prisma.UserWhereInput;
+        filterArray.push({
+          [field]: {
+            contains: filter[key] as string,
+            mode:     'insensitive',
+          },
+        });
+      }
+    }
+    where.AND = filterArray;
     return {
       rows: await this.prismaService.user.findMany({
         orderBy: { id: 'asc' },
-        where:   {
-          id: {
-            in: filter.ids,
-          },
-        },
+        where,
       }),
-      count: await this.prismaService.user.count({
-        where: {
-          id: {
-            in: filter.ids,
-          },
-        },
-      }),
+      count: await this.prismaService.user.count({ where }),
     };
   }
 
@@ -79,7 +88,7 @@ export class UserService {
           id,
         },
       })
-      .catch(_ => {
+      .catch((_: any) => {
         throw new NotFoundException({ message: 'User not found' });
       });
 
