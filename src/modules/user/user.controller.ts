@@ -40,16 +40,6 @@ export class UserController {
     return this.userService.findAndCount(filter);
   }
 
-  @Get('search')
-  async searchUsers(@Query('query') query: string): Promise<User[]> {
-    const searchResults = await this.userService.searchUsers(query);
-
-    if (searchResults.length === 0) {
-      throw new NotFoundException({ message: 'No users found' });
-    }
-    return searchResults;
-  }
-
   @Put(':id')
   async putEditUser(
     @Param('id', ParseIntPipe) id: number,

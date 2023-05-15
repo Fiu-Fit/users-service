@@ -67,20 +67,6 @@ export class UserService {
     });
   }
 
-  async searchUsers(query: string): Promise<User[]> {
-    const users = await this.prismaService.user.findMany({
-      where: {
-        OR: [
-          { firstName: { contains: query, mode: 'insensitive' } },
-          { lastName: { contains: query, mode: 'insensitive' } },
-          { email: { contains: query, mode: 'insensitive' } },
-        ],
-      },
-    });
-
-    return users;
-  }
-
   async deleteUser(id: number): Promise<User> {
     const user = await this.prismaService.user
       .delete({
