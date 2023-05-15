@@ -14,7 +14,7 @@ import { GetUsersQueryDTO, UserDTO } from './dto';
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
-  async findAndCount(this: any, filter: GetUsersQueryDTO): Promise<Page<User>> {
+  async findAndCount(filter: GetUsersQueryDTO): Promise<Page<User>> {
     const where: Prisma.UserWhereInput = {
       id: {
         in: filter.ids,
@@ -74,7 +74,7 @@ export class UserService {
           id,
         },
       })
-      .catch((_: any) => {
+      .catch(() => {
         throw new NotFoundException({ message: 'User not found' });
       });
 
