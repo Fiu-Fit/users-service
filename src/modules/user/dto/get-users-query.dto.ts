@@ -1,5 +1,6 @@
+import { Role } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsArray, IsInt, IsOptional } from 'class-validator';
+import { IsArray, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class GetUsersQueryDTO {
   @IsOptional()
@@ -12,4 +13,22 @@ export class GetUsersQueryDTO {
       .map((id: string) => Number(id))
   )
   ids?: number[];
+
+  @IsOptional()
+  @IsString()
+  firstName?: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @IsOptional()
+  @IsString()
+  lastName?: string;
+
+  @IsOptional()
+  @IsString()
+  role?: Role;
+
+  [key: string]: string | number[] | undefined;
 }
