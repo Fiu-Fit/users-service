@@ -57,6 +57,47 @@ export class UserService {
     });
   }
 
+  async getFavoriteWorkouts(id: number): Promise<string[]> {
+    const user = await this.getUserById(id);
+    if (!user) {
+      throw new NotFoundException({ message: 'User not found' });
+    }
+    return user.favoriteWorkouts;
+  }
+
+  async addFavoriteWorkout(id: number, workoutId: string): Promise<User> {
+    const user = await this.getUserById(id);
+    if (!user) {
+      throw new NotFoundException({ message: 'User not found' });
+    }
+
+    if (user.favoriteWorkouts.includes(workoutId)) {
+      // do not add duplicate id
+      return user;
+    }
+
+    const favoriteWorkouts = [...user.favoriteWorkouts, workoutId];
+    return this.prismaService.user.update({
+      where: { id },
+      data:  { favoriteWorkouts },
+    });
+  }
+
+  async removeFavoriteWorkout(id: number, workoutId: string): Promise<User> {
+    const user = await this.getUserById(id);
+    if (!user) {
+      throw new NotFoundException({ message: 'User not found' });
+    }
+
+    const favoriteWorkouts = user.favoriteWorkouts.filter(
+      idToDelete => idToDelete !== workoutId
+    );
+    return this.prismaService.user.update({
+      where: { id },
+      data:  { favoriteWorkouts },
+    });
+  }
+
   getUserByEmail(email: string): Promise<User | null> {
     return this.prismaService.user.findUnique({
       where: { email },

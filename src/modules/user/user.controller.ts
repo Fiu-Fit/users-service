@@ -40,6 +40,27 @@ export class UserController {
     return this.userService.findAndCount(filter);
   }
 
+  @Get(':id/favoriteWorkouts')
+  getFavoriteWorkouts(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.getFavoriteWorkouts(id);
+  }
+
+  @Put(':id/favoriteWorkouts')
+  addFavoriteWorkout(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('workoutId') workoutId: string
+  ): Promise<User> {
+    return this.userService.addFavoriteWorkout(id, workoutId);
+  }
+
+  @Delete(':id/favoriteWorkouts/:workoutId')
+  removeFavoriteWorkout(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('workoutId') workoutId: string
+  ): Promise<User> {
+    return this.userService.removeFavoriteWorkout(id, workoutId);
+  }
+
   @Put(':id')
   async putEditUser(
     @Param('id', ParseIntPipe) id: number,
