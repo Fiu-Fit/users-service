@@ -15,6 +15,7 @@ export interface User {
   lastName: string;
   email: string;
   role: Role;
+  favoriteWorkouts: string[];
 }
 
 export interface Empty {}
