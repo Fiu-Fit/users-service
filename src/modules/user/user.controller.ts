@@ -1,4 +1,4 @@
-import { Page } from '@fiu-fit/common';
+import { Page, Workout } from '@fiu-fit/common';
 import {
   Body,
   Controller,
@@ -41,7 +41,9 @@ export class UserController {
   }
 
   @Get(':id/favoriteWorkouts')
-  getFavoriteWorkouts(@Param('id', ParseIntPipe) id: number) {
+  getFavoriteWorkouts(
+    @Param('id', ParseIntPipe) id: number
+  ): Promise<Workout[]> {
     return this.userService.getFavoriteWorkouts(id);
   }
 

@@ -1,4 +1,5 @@
-import { Page } from '@fiu-fit/common';
+import { Page, Workout } from '@fiu-fit/common';
+import { HttpService } from '@nestjs/axios';
 import {
   Injectable,
   NotFoundException,
@@ -6,13 +7,17 @@ import {
 } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import * as admin from 'firebase-admin';
+import { firstValueFrom } from 'rxjs';
 import { firebaseAdmin } from '../../firebase/firebase';
 import { PrismaService } from '../../prisma.service';
 import { GetUsersQueryDTO, UserDTO } from './dto';
 
 @Injectable()
 export class UserService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private httpService: HttpService
+  ) {}
 
   async findAndCount(filter: GetUsersQueryDTO): Promise<Page<User>> {
     const { ids, role, ...filters } = filter;
@@ -57,12 +62,24 @@ export class UserService {
     });
   }
 
-  async getFavoriteWorkouts(id: number): Promise<string[]> {
+  async getFavoriteWorkouts(id: number): Promise<Workout[]> {
     const user = await this.getUserById(id);
     if (!user) {
       throw new NotFoundException({ message: 'User not found' });
     }
-    return user.favoriteWorkouts;
+    const favorites = [];
+
+    for (const workoutId of user.favoriteWorkouts) {
+      const workout = await firstValueFrom(
+        this.httpService.get<Workout>(
+          `${process.env.WORKOUT_SERVICE_URL}/workouts/${workoutId}`,
+          { headers: { 'api-key': process.env.WORKOUT_API_KEY } }
+        )
+      );
+
+      favorites.push(workout.data);
+    }
+    return favorites;
   }
 
   async addFavoriteWorkout(id: number, workoutId: string): Promise<User> {
