@@ -30,5 +30,9 @@ export class GetUsersQueryDTO {
   @IsString()
   role?: Role;
 
+  @IsOptional()
+  @IsString()
+  params?: string;
+
   [key: string]: string | number[] | undefined;
 }

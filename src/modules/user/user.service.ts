@@ -15,6 +15,43 @@ export class UserService {
   constructor(private prismaService: PrismaService) {}
 
   async findAndCount(filter: GetUsersQueryDTO): Promise<Page<User>> {
+    const response = filter.params
+      ? await this.simpleFilter(filter)
+      : await this.advancedFilter(filter);
+    return response;
+  }
+
+  async simpleFilter(filter: GetUsersQueryDTO): Promise<Page<User>> {
+    const { params } = filter;
+    const where: Prisma.UserWhereInput = {
+      OR: [],
+    };
+    const filterArray: any[] = [];
+    const paramsArray: string[] = params?.split(' ') ?? [];
+    const fields = Object.getOwnPropertyNames(filter);
+    paramsArray.map(param => {
+      fields.map(field => {
+        if (field != 'ids' && field != 'role' && field != 'params') {
+          filterArray.push({
+            [field as keyof Prisma.UserWhereInput]: {
+              contains: param,
+              mode:     'insensitive',
+            },
+          });
+        }
+      });
+    });
+    where.OR = filterArray;
+    return {
+      rows: await this.prismaService.user.findMany({
+        orderBy: { id: 'asc' },
+        where,
+      }),
+      count: await this.prismaService.user.count({ where }),
+    };
+  }
+
+  async advancedFilter(filter: GetUsersQueryDTO): Promise<Page<User>> {
     const { ids, role, ...filters } = filter;
     const where: Prisma.UserWhereInput = {
       id: {
