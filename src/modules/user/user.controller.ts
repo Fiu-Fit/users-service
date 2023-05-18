@@ -1,4 +1,4 @@
-import { Page } from '@fiu-fit/common';
+import { Page, Workout } from '@fiu-fit/common';
 import {
   Body,
   Controller,
@@ -38,6 +38,29 @@ export class UserController {
   @Get()
   getUsers(@Query() filter: GetUsersQueryDTO): Promise<Page<User>> {
     return this.userService.findAndCount(filter);
+  }
+
+  @Get(':id/favoriteWorkouts')
+  getFavoriteWorkouts(
+    @Param('id', ParseIntPipe) id: number
+  ): Promise<Workout[]> {
+    return this.userService.getFavoriteWorkouts(id);
+  }
+
+  @Put(':id/favoriteWorkouts')
+  addFavoriteWorkout(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('workoutId') workoutId: string
+  ): Promise<User> {
+    return this.userService.addFavoriteWorkout(id, workoutId);
+  }
+
+  @Delete(':id/favoriteWorkouts/:workoutId')
+  removeFavoriteWorkout(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('workoutId') workoutId: string
+  ): Promise<User> {
+    return this.userService.removeFavoriteWorkout(id, workoutId);
   }
 
   @Put(':id')

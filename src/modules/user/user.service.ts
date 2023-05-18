@@ -1,4 +1,5 @@
-import { Page } from '@fiu-fit/common';
+import { Page, Workout } from '@fiu-fit/common';
+import { HttpService } from '@nestjs/axios';
 import {
   Injectable,
   NotFoundException,
@@ -6,13 +7,17 @@ import {
 } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import * as admin from 'firebase-admin';
+import { firstValueFrom } from 'rxjs';
 import { firebaseAdmin } from '../../firebase/firebase';
 import { PrismaService } from '../../prisma.service';
 import { GetUsersQueryDTO, UserDTO } from './dto';
 
 @Injectable()
 export class UserService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private httpService: HttpService
+  ) {}
 
   async findAndCount(filter: GetUsersQueryDTO): Promise<Page<User>> {
     const response = filter.params
@@ -91,6 +96,60 @@ export class UserService {
   getUserById(id: number): Promise<User | null> {
     return this.prismaService.user.findUnique({
       where: { id },
+    });
+  }
+
+  async getFavoriteWorkouts(id: number): Promise<Workout[]> {
+    const user = await this.getUserById(id);
+    if (!user) {
+      throw new NotFoundException({ message: 'User not found' });
+    }
+
+    const filter = { filters: JSON.stringify({ _id: user.favoriteWorkouts }) };
+
+    const workouts = await firstValueFrom(
+      this.httpService.get<Workout[]>(
+        `${process.env.WORKOUT_SERVICE_URL}/workouts`,
+        {
+          params:  filter,
+          headers: { 'api-key': process.env.WORKOUT_API_KEY },
+        }
+      )
+    );
+
+    return workouts.data;
+  }
+
+  async addFavoriteWorkout(id: number, workoutId: string): Promise<User> {
+    const user = await this.getUserById(id);
+    if (!user) {
+      throw new NotFoundException({ message: 'User not found' });
+    }
+
+    if (user.favoriteWorkouts.includes(workoutId)) {
+      // do not add duplicate id
+      return user;
+    }
+
+    const favoriteWorkouts = [...user.favoriteWorkouts, workoutId];
+    return this.prismaService.user.update({
+      where: { id },
+      data:  { favoriteWorkouts },
+    });
+  }
+
+  async removeFavoriteWorkout(id: number, workoutId: string): Promise<User> {
+    const user = await this.getUserById(id);
+    if (!user) {
+      throw new NotFoundException({ message: 'User not found' });
+    }
+
+    const favoriteWorkouts = user.favoriteWorkouts.filter(
+      idToDelete => idToDelete !== workoutId
+    );
+    return this.prismaService.user.update({
+      where: { id },
+      data:  { favoriteWorkouts },
     });
   }
 
