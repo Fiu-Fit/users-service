@@ -67,19 +67,20 @@ export class UserService {
     if (!user) {
       throw new NotFoundException({ message: 'User not found' });
     }
-    const favorites = [];
 
-    for (const workoutId of user.favoriteWorkouts) {
-      const workout = await firstValueFrom(
-        this.httpService.get<Workout>(
-          `${process.env.WORKOUT_SERVICE_URL}/workouts/${workoutId}`,
-          { headers: { 'api-key': process.env.WORKOUT_API_KEY } }
-        )
-      );
+    const filter = { filters: JSON.stringify({ _id: user.favoriteWorkouts }) };
 
-      favorites.push(workout.data);
-    }
-    return favorites;
+    const workouts = await firstValueFrom(
+      this.httpService.get<Workout[]>(
+        `${process.env.WORKOUT_SERVICE_URL}/workouts`,
+        {
+          params:  filter,
+          headers: { 'api-key': process.env.WORKOUT_API_KEY },
+        }
+      )
+    );
+
+    return workouts.data;
   }
 
   async addFavoriteWorkout(id: number, workoutId: string): Promise<User> {
