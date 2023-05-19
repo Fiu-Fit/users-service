@@ -164,10 +164,7 @@ export class UserService {
       where: {
         id,
       },
-      data: {
-        ...user,
-        role: user.role,
-      },
+      data: user,
     });
   }
 
@@ -189,6 +186,12 @@ export class UserService {
     await firebaseAdmin.auth().deleteUser(user.uid);
 
     return user;
+  }
+
+  createUser(user: UserDTO): Promise<User> {
+    return this.prismaService.user.create({
+      data: user,
+    });
   }
 
   async getUserByToken(authHeader: string): Promise<User | null> {
