@@ -102,4 +102,9 @@ export class UserController {
 
     return user;
   }
+
+  @Post()
+  createUser(@Body() user: UserDTO): Promise<User> {
+    return this.userService.createUser(user);
+  }
 }
