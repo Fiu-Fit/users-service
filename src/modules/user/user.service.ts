@@ -190,7 +190,10 @@ export class UserService {
 
   createUser(user: UserDTO): Promise<User> {
     return this.prismaService.user.create({
-      data: user,
+      data: {
+        ...user,
+        federated_identity: true,
+      },
     });
   }
 
