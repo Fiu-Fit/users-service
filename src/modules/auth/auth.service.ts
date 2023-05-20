@@ -4,7 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import {
   UserCredential,
   createUserWithEmailAndPassword,
@@ -147,6 +147,22 @@ export class AuthService {
       },
       data: {
         lastLogin: new Date(),
+      },
+    });
+  }
+
+  async addPasswordReset(token: string): Promise<User> {
+    const user = await this.userService.getUserByToken(token);
+    if (!user) throw new UnauthorizedException('Invalid token');
+
+    return this.prismaService.user.update({
+      where: {
+        uid: user.uid,
+      },
+      data: {
+        passwordResets: {
+          push: new Date(),
+        },
       },
     });
   }
