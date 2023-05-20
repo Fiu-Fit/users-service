@@ -2,7 +2,7 @@ import { Page } from '@fiu-fit/common';
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
-import { GetUsersMetricsQueryDTO } from './dto';
+import { GetAuthMetricsQueryDTO } from './dto';
 
 @Injectable()
 export class MetricsService {
@@ -27,9 +27,10 @@ export class MetricsService {
     };
   }
 
-  getLoginMetrics(filter: GetUsersMetricsQueryDTO): Promise<Page<User>> {
+  getLoginMetrics(filter: GetAuthMetricsQueryDTO): Promise<Page<User>> {
     const where = {
       federatedIdentity: filter.federatedIdentity,
+      blocked:           filter.blocked,
       lastLogin:         {
         gte: filter.start,
         lte: filter.end,
@@ -39,21 +40,14 @@ export class MetricsService {
     return this.findAndCount(where);
   }
 
-  getRegisterMetrics(filter: GetUsersMetricsQueryDTO): Promise<Page<User>> {
+  getRegisterMetrics(filter: GetAuthMetricsQueryDTO): Promise<Page<User>> {
     const where = {
       federatedIdentity: filter.federatedIdentity,
+      blocked:           filter.blocked,
       createdAt:         {
         gte: filter.start,
         lte: filter.end,
       },
-    };
-
-    return this.findAndCount(where);
-  }
-
-  getBlockedMetrics(): Promise<Page<User>> {
-    const where = {
-      blocked: true,
     };
 
     return this.findAndCount(where);

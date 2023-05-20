@@ -12,11 +12,16 @@ const booleanMapper = (transformParams: TransformFnParams) => {
   }
 };
 
-export class GetUsersMetricsQueryDTO {
+export class GetAuthMetricsQueryDTO {
   @IsOptional()
   @IsBoolean()
   @Transform(booleanMapper)
   federatedIdentity?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @Transform(booleanMapper)
+  blocked?: boolean;
 
   @IsOptional()
   @IsDateString()
