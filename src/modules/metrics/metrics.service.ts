@@ -52,4 +52,17 @@ export class MetricsService {
 
     return this.findAndCount(where);
   }
+
+  getPasswordResetMetrics(filter: GetAuthMetricsQueryDTO): Promise<Page<User>> {
+    const where = {
+      federatedIdentity: filter.federatedIdentity,
+      blocked:           filter.blocked,
+      createdAt:         {
+        gte: filter.start,
+        lte: filter.end,
+      },
+    };
+
+    return this.findAndCount(where);
+  }
 }
