@@ -94,6 +94,8 @@ export class AuthService {
       });
     }
 
+    await this.updateLoginTime(user.uid);
+
     return { token };
   }
 
@@ -122,6 +124,8 @@ export class AuthService {
       });
     }
 
+    await this.updateLoginTime(user.uid);
+
     return { token };
   }
 
@@ -134,5 +138,16 @@ export class AuthService {
         message: `Error while logging out: ${error}`,
       });
     }
+  }
+
+  async updateLoginTime(uid: string): Promise<void> {
+    await this.prismaService.user.update({
+      where: {
+        uid: uid,
+      },
+      data: {
+        lastLogin: new Date(),
+      },
+    });
   }
 }

@@ -192,7 +192,7 @@ export class UserService {
     return this.prismaService.user.create({
       data: {
         ...user,
-        federated_identity: true,
+        federatedIdentity: true,
       },
     });
   }
