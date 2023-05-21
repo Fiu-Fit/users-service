@@ -17,7 +17,7 @@ model User {
   firstName  String @map("first_name")
   lastName   String @map("last_name")
   bodyWeight Float
-  favoriteWorkouts String[] @default([])
+  favoriteWorkouts String[] @default([]) @map("favorite_workouts")
   role       Role
 }
 
@@ -25,4 +25,12 @@ enum Role {
   Athlete
   Trainer
   Admin
+}
+
+model Follower {
+  id        Int     @id @default(autoincrement())
+  followerId Int    @map("follower_id")
+  followingId Int   @map("following_id")
+
+  @@unique(fields: [followerId, followingId], name: "followerFollowingId")
 }
