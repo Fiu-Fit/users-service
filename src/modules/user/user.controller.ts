@@ -10,17 +10,21 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UnauthorizedException,
-  Query
 } from '@nestjs/common';
-import { Role, User } from '@prisma/client';
+import { Follower, Role, User } from '@prisma/client';
+import { FollowerService } from '../followers/follower.service';
 import { GetUsersQueryDTO } from './dto';
 import { UserDTO } from './dto/user.dto';
 import { UserService } from './user.service';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly followerService: FollowerService
+  ) {}
 
   @Get(':id')
   async getUserById(
@@ -38,29 +42,6 @@ export class UserController {
   @Get()
   getUsers(@Query() filter: GetUsersQueryDTO): Promise<Page<User>> {
     return this.userService.findAndCount(filter);
-  }
-
-  @Get(':id/favoriteWorkouts')
-  getFavoriteWorkouts(
-    @Param('id', ParseIntPipe) id: number
-  ): Promise<Workout[]> {
-    return this.userService.getFavoriteWorkouts(id);
-  }
-
-  @Put(':id/favoriteWorkouts')
-  addFavoriteWorkout(
-    @Param('id', ParseIntPipe) id: number,
-    @Body('workoutId') workoutId: string
-  ): Promise<User> {
-    return this.userService.addFavoriteWorkout(id, workoutId);
-  }
-
-  @Delete(':id/favoriteWorkouts/:workoutId')
-  removeFavoriteWorkout(
-    @Param('id', ParseIntPipe) id: number,
-    @Param('workoutId') workoutId: string
-  ): Promise<User> {
-    return this.userService.removeFavoriteWorkout(id, workoutId);
   }
 
   @Put(':id')
@@ -112,5 +93,54 @@ export class UserController {
     }
 
     return this.userService.createUser(user);
+  }
+
+  @Get(':id/favoriteWorkouts')
+  getFavoriteWorkouts(
+    @Param('id', ParseIntPipe) id: number
+  ): Promise<Workout[]> {
+    return this.userService.getFavoriteWorkouts(id);
+  }
+
+  @Put(':id/favoriteWorkouts')
+  addFavoriteWorkout(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('workoutId') workoutId: string
+  ): Promise<User> {
+    return this.userService.addFavoriteWorkout(id, workoutId);
+  }
+
+  @Delete(':id/favoriteWorkouts/:workoutId')
+  removeFavoriteWorkout(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('workoutId') workoutId: string
+  ): Promise<User> {
+    return this.userService.removeFavoriteWorkout(id, workoutId);
+  }
+
+  @Post(':id/follow')
+  followUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('followerId') followerId: number
+  ): Promise<Follower> {
+    return this.followerService.followUser(id, followerId);
+  }
+
+  @Get(':id/followers')
+  getFollowers(@Param('id', ParseIntPipe) id: number): Promise<Page<User>> {
+    return this.followerService.getUserFollowers(id);
+  }
+
+  @Get(':id/following')
+  getFollowing(@Param('id', ParseIntPipe) id: number): Promise<Page<User>> {
+    return this.followerService.getUserFollowings(id);
+  }
+
+  @Delete(':id/unfollow/:followerId')
+  unfollowUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('followerId', ParseIntPipe) followerId: number
+  ): Promise<Follower> {
+    return this.followerService.unfollowUser(id, followerId);
   }
 }
