@@ -76,7 +76,7 @@ export class AuthService {
       });
     }
 
-    await this.updateLoginTime(user.uid);
+    await this.updateLoginTime(user.id);
 
     return { token };
   }
@@ -91,7 +91,7 @@ export class AuthService {
       });
     }
 
-    await this.updateLoginTime(user.uid);
+    await this.updateLoginTime(user.id);
 
     return { token };
   }
@@ -107,10 +107,10 @@ export class AuthService {
     }
   }
 
-  async updateLoginTime(uid: string): Promise<void> {
+  async updateLoginTime(userId: number): Promise<void> {
     await this.prismaService.userActivity.create({
       data: {
-        userId:    uid,
+        userId,
         type:      UserActivityType.Login,
         timestamp: new Date(),
       },
@@ -143,7 +143,7 @@ export class AuthService {
 
     return this.prismaService.userActivity.create({
       data: {
-        userId:    user.uid,
+        userId:    user.id,
         type:      UserActivityType.PasswordReset,
         timestamp: new Date(),
       },
