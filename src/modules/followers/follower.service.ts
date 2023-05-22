@@ -14,61 +14,52 @@ export class FollowerService {
   followUser(userId: number, followerId: number): Promise<Follower> {
     return this.prismaService.follower.create({
       data: {
-        followerId:  userId,
-        followingId: followerId,
+        userId,
+        followerId,
       },
     });
   }
 
   async getUserFollowers(id: number): Promise<Page<User>> {
-    const followers = {
-      rows: await this.prismaService.follower.findMany({
-        orderBy: { id: 'asc' },
-        where:   { followingId: id },
-      }),
-      count: await this.prismaService.follower.count({
-        where: { followingId: id },
-      }),
-    };
-
-    return this.userService.findAndCount({
-      ids: followers.rows.map(follower => follower.followerId),
-    });
-  }
-
-  async getUserFollowings(id: number): Promise<Page<User>> {
-    const following = {
-      rows: await this.prismaService.follower.findMany({
-        orderBy: { id: 'asc' },
-        where:   { followerId: id },
-      }),
-      count: await this.prismaService.follower.count({
-        where: { followerId: id },
-      }),
-    };
-
-    return this.userService.findAndCount({
-      ids: following.rows.map(follower => follower.followingId),
-    });
-  }
-
-  getFollowerById(id: number): Promise<Follower | null> {
-    const follower = this.prismaService.follower.findUnique({
-      where: { id },
+    const user = await this.prismaService.user.findUnique({
+      where:   { id },
+      include: {
+        followers: {
+          select: {
+            followerId: true,
+            follwedAt:  true,
+          },
+        },
+      },
     });
 
-    if (!follower) {
-      throw new NotFoundException('Follower not found');
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
-    return follower;
+
+    return this.userService.findAndCount({
+      ids: user.followers.map(follower => follower.followerId),
+    });
   }
 
-  unfollowUser(followerId: number, followingId: number): Promise<Follower> {
+  async getUserFollowings(followerId: number): Promise<Page<User>> {
+    const followingUsers = await this.prismaService.follower.findMany({
+      where:  { followerId },
+      select: { user: true },
+    });
+
+    return {
+      rows:  followingUsers.map(following => following.user),
+      count: followingUsers.length,
+    };
+  }
+
+  unfollowUser(followerId: number, userId: number): Promise<Follower> {
     return this.prismaService.follower.delete({
       where: {
         followerFollowingId: {
+          userId,
           followerId,
-          followingId,
         },
       },
     });
