@@ -15,7 +15,7 @@ import {
 import { firebaseApp } from '../../firebase/firebase';
 import { PrismaService } from '../../prisma.service';
 import { UserService } from '../user/user.service';
-import { LoginRequest, RegisterRequest } from './dto';
+import { AdminRegisterRequest, LoginRequest, RegisterRequest } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +24,9 @@ export class AuthService {
     private userService: UserService
   ) {}
 
-  async register(newUser: RegisterRequest): Promise<{ token: string }> {
+  async register(
+    newUser: RegisterRequest | AdminRegisterRequest
+  ): Promise<{ token: string }> {
     const auth = getAuth(firebaseApp);
     let userCredentials: UserCredential;
     let token: string;

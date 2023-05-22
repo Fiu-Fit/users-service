@@ -4,10 +4,8 @@ import {
   Headers,
   Post,
   UnauthorizedException,
-  UseGuards,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { AdminGuard } from './admin.guard';
 import { AuthService } from './auth.service';
 import { AdminRegisterRequest, LoginRequest, RegisterRequest } from './dto';
 
@@ -29,18 +27,12 @@ export class AuthController {
     return this.authService.login(loginInfo);
   }
 
-  @UseGuards(AdminGuard)
+  // @UseGuards(AdminGuard)
   @Post('admin/register')
   adminRegister(
     @Body() newUser: AdminRegisterRequest
   ): Promise<{ token: string }> {
-    const registerRequest: RegisterRequest = {
-      ...newUser,
-      bodyWeight: -1,
-      role:       Role.Admin,
-    };
-
-    return this.authService.register(registerRequest);
+    return this.authService.register(newUser);
   }
 
   @Post('admin/login')
