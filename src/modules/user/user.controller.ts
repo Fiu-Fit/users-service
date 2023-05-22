@@ -10,8 +10,8 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UnauthorizedException,
-  Query
 } from '@nestjs/common';
 import { Role, User } from '@prisma/client';
 import { GetUsersQueryDTO } from './dto';
