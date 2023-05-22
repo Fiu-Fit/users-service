@@ -32,13 +32,19 @@
     "lint:prettier": "prettier --config .prettierrc.json --ignore-path .prettierignore --write",
     "lint:eslint": "eslint --fix -c .eslintrc.json --ignore-path .eslintignore",
     "lint": "yarn run lint:prettier && yarn run lint:eslint",
-    "common:install": "yarn add https://github.com/Fiu-Fit/common.git && yarn"
+    "common:install": "yarn add ssh://git@github.com:Fiu-Fit/common.git && yarn",
+    "proto:user": "npx protoc --plugin=node_modules/.bin/protoc-gen-ts_proto -I=./node_modules/@fiu-fit/common/src/protos --ts_proto_out=src/modules/user/interfaces/ node_modules/@fiu-fit/common/src/protos/user.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
+    "proto:auth": "npx protoc --plugin=node_modules/.bin/protoc-gen-ts_proto -I=./node_modules/@fiu-fit/common/src/protos --ts_proto_out=src/modules/auth/interfaces/ node_modules/@fiu-fit/common/src/protos/auth.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
+    "proto:all": "yarn run common:install && yarn run proto:user && yarn run proto:auth",
+    "proto:user:win": "npx protoc --plugin=node_modules/.bin/protoc-gen-ts_proto.cmd -I=./node_modules/@fiu-fit/common/src/protos --ts_proto_out=src/modules/user/interfaces/ node_modules/@fiu-fit/common/src/protos/user.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
+    "proto:auth:win": "npx protoc --plugin=node_modules/.bin/protoc-gen-ts_proto.cmd -I=./node_modules/@fiu-fit/common/src/protos --ts_proto_out=src/modules/auth/interfaces/ node_modules/@fiu-fit/common/src/protos/auth.proto --ts_proto_opt=nestJs=true --ts_proto_opt=fileSuffix=.pb",
+    "proto:all:win": "yarn run common:install && yarn run proto:user:win && yarn run proto:auth:win"
   },
   "prisma": {
     "seed": "ts-node ./prisma/seeder.ts"
   },
   "dependencies": {
-    "@fiu-fit/common": "https://github.com/Fiu-Fit/common.git",
+    "@fiu-fit/common": "ssh://git@github.com:Fiu-Fit/common.git",
     "@grpc/grpc-js": "^1.8.13",
     "@grpc/proto-loader": "^0.7.6",
     "@nestjs/axios": "^2.0.0",

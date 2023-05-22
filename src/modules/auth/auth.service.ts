@@ -4,7 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Role, User } from '@prisma/client';
+import { Role } from '@prisma/client';
 import {
   UserCredential,
   createUserWithEmailAndPassword,
@@ -94,8 +94,6 @@ export class AuthService {
       });
     }
 
-    await this.updateLoginTime(user.uid);
-
     return { token };
   }
 
@@ -124,8 +122,6 @@ export class AuthService {
       });
     }
 
-    await this.updateLoginTime(user.uid);
-
     return { token };
   }
 
@@ -138,32 +134,5 @@ export class AuthService {
         message: `Error while logging out: ${error}`,
       });
     }
-  }
-
-  async updateLoginTime(uid: string): Promise<void> {
-    await this.prismaService.user.update({
-      where: {
-        uid: uid,
-      },
-      data: {
-        lastLogin: new Date(),
-      },
-    });
-  }
-
-  async addPasswordReset(token: string): Promise<User> {
-    const user = await this.userService.getUserByToken(token);
-    if (!user) throw new UnauthorizedException('Invalid token');
-
-    return this.prismaService.user.update({
-      where: {
-        uid: user.uid,
-      },
-      data: {
-        passwordResets: {
-          push: new Date(),
-        },
-      },
-    });
   }
 }

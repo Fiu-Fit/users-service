@@ -875,9 +875,9 @@
   resolved "https://registry.yarnpkg.com/@firebase/webchannel-wrapper/-/webchannel-wrapper-0.9.0.tgz#9340bce56560a8bdba1d25d6281d4bfc397450dc"
   integrity sha512-BpiZLBWdLFw+qFel9p3Zs1jD6QmH7Ii4aTDu6+vx8ShdidChZUXqDhYJly4ZjSgQh54miXbBgBrk0S+jTIh/Qg==
 
-"@fiu-fit/common@https://github.com/Fiu-Fit/common.git":
+"@fiu-fit/common@ssh://git@github.com:Fiu-Fit/common.git":
   version "1.0.0"
-  resolved "https://github.com/Fiu-Fit/common.git#ac892c5f8361ee32f283b274033181a2f1b0f4c5"
+  resolved "ssh://git@github.com:Fiu-Fit/common.git#ac892c5f8361ee32f283b274033181a2f1b0f4c5"
   dependencies:
     winston "^3.8.2"
 
