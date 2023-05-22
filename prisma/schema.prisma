@@ -11,23 +11,35 @@ datasource db {
 }
 
 model User {
-  id                Int        @id @default(autoincrement())
-  uid               String     @unique
-  email             String     @unique
-  firstName         String     @map("first_name")
-  lastName          String     @map("last_name")
-  bodyWeight        Float      @map("body_weight")
-  favoriteWorkouts  String[]   @default([]) @map("favorite_workouts")
+  id                Int            @id @default(autoincrement())
+  uid               String         @unique
+  email             String         @unique
+  firstName         String         @map("first_name")
+  lastName          String         @map("last_name")
+  bodyWeight        Float          @map("body_weight")
   role              Role
-  blocked           Boolean    @default(false)
-  federatedIdentity Boolean    @default(false) @map("federated_identity")
-  passwordResets    DateTime[] @default([]) @map("password_resets")
-  lastLogin         DateTime   @default(now()) @map("last_login")
-  createdAt         DateTime   @default(now()) @map("created_at")
+  blocked           Boolean        @default(false)
+  federatedIdentity Boolean        @default(false) @map("federated_identity")
+  favoriteWorkouts  String[]       @default([]) @map("favorite_workouts")
+  userActivity      UserActivity[]
+  createdAt         DateTime       @default(now()) @map("created_at")
 }
 
 enum Role {
   Athlete
   Trainer
   Admin
+}
+
+model UserActivity {
+  id        Int              @id @default(autoincrement())
+  type      UserActivityType
+  timestamp DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [uid])
+  userId    String           @map("user_id")
+}
+
+enum UserActivityType {
+  Login
+  PasswordReset
 }

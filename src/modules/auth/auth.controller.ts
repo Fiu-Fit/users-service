@@ -4,8 +4,10 @@ import {
   Headers,
   Post,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
+import { AdminGuard } from './admin.guard';
 import { AuthService } from './auth.service';
 import { AdminRegisterRequest, LoginRequest, RegisterRequest } from './dto';
 
@@ -27,7 +29,7 @@ export class AuthController {
     return this.authService.login(loginInfo);
   }
 
-  // @UseGuards(AdminGuard)
+  @UseGuards(AdminGuard)
   @Post('admin/register')
   adminRegister(
     @Body() newUser: AdminRegisterRequest
@@ -46,7 +48,7 @@ export class AuthController {
   }
 
   @Post('password-reset')
-  passwordReset(@Headers('Authorization') bearerToken: string) {
-    return this.authService.addPasswordReset(bearerToken);
+  async passwordReset(@Headers('Authorization') bearerToken: string) {
+    await this.authService.addPasswordReset(bearerToken);
   }
 }

@@ -18,7 +18,6 @@ export class MetricsService {
           lastName:          true,
           email:             true,
           federatedIdentity: true,
-          lastLogin:         true,
           createdAt:         true,
           blocked:           true,
         },
