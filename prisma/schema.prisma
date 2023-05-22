@@ -18,6 +18,7 @@ model User {
   lastName   String @map("last_name")
   bodyWeight Float
   favoriteWorkouts String[] @default([]) @map("favorite_workouts")
+  followers  Follower[]
   role       Role
 }
 
@@ -29,8 +30,10 @@ enum Role {
 
 model Follower {
   id        Int     @id @default(autoincrement())
-  followerId Int    @map("follower_id")
-  followingId Int   @map("following_id")
+  user  User    @relation(fields: [userId], references: [id])
+  userId Int    @map("user_id")
+  followerId Int   @map("follower_id")
+  follwedAt DateTime @default(now()) @map("followed_at")
 
-  @@unique(fields: [followerId, followingId], name: "followerFollowingId")
+  @@unique(fields: [userId, followerId], name: "followerFollowingId")
 }
