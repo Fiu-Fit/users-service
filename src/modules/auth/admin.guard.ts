@@ -28,7 +28,7 @@ export class AdminGuard implements CanActivate {
     } catch (err) {
       logger.error('Error verifying token: ', err);
       throw new UnauthorizedException({
-        message: 'Invalid token: user not found or not an admin',
+        message: 'Invalid token',
       });
     }
 
@@ -44,7 +44,7 @@ export class AdminGuard implements CanActivate {
 
     if (!user || user.role !== Role.Admin) {
       throw new UnauthorizedException({
-        message: 'Invalid token: user not found or not an admin',
+        message: 'Invalid token',
       });
     }
 
