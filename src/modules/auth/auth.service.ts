@@ -65,31 +65,11 @@ export class AuthService {
   }
 
   async login(loginInfo: LoginRequest): Promise<{ token: string }> {
-    const auth = getAuth(firebaseApp);
-    let userCredentials: UserCredential;
-    let token: string;
-    try {
-      userCredentials = await signInWithEmailAndPassword(
-        auth,
-        loginInfo.email,
-        loginInfo.password
-      );
-      userCredentials.user.uid;
-      token = await userCredentials.user.getIdToken();
-    } catch (error) {
-      throw new BadRequestException({
-        message: 'Invalid Credentials',
-      });
-    }
-
-    const user = await this.prismaService.user.findUnique({
-      where: {
-        uid: userCredentials.user.uid,
-      },
-    });
+    const token = await this.getUserToken(loginInfo);
+    const user = await this.userService.getUserByToken(token);
 
     if (!user || user.role === Role.Admin) {
-      throw new BadRequestException({
+      throw new UnauthorizedException({
         message: 'Invalid Credentials',
       });
     }
@@ -100,23 +80,8 @@ export class AuthService {
   }
 
   async adminLogin(loginInfo: LoginRequest): Promise<{ token: string }> {
-    const auth = getAuth(firebaseApp);
-    let userCredentials: UserCredential;
-    let token: string;
-    try {
-      userCredentials = await signInWithEmailAndPassword(
-        auth,
-        loginInfo.email,
-        loginInfo.password
-      );
-      token = await userCredentials.user.getIdToken();
-    } catch (error) {
-      throw new BadRequestException({
-        message: 'Invalid Credentials',
-      });
-    }
-
-    const user = await this.userService.getUserByEmail(loginInfo.email);
+    const token = await this.getUserToken(loginInfo);
+    const user = await this.userService.getUserByToken(token);
 
     if (!user || user.role !== Role.Admin) {
       throw new UnauthorizedException({
@@ -149,6 +114,26 @@ export class AuthService {
         lastLogin: new Date(),
       },
     });
+  }
+
+  async getUserToken(loginInfo: LoginRequest): Promise<string> {
+    const auth = getAuth(firebaseApp);
+    let userCredentials: UserCredential;
+    let token: string;
+    try {
+      userCredentials = await signInWithEmailAndPassword(
+        auth,
+        loginInfo.email,
+        loginInfo.password
+      );
+      token = await userCredentials.user.getIdToken();
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Invalid Credentials',
+      });
+    }
+
+    return token;
   }
 
   async addPasswordReset(token: string): Promise<User> {

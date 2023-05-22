@@ -34,14 +34,10 @@ export class AuthController {
   adminRegister(
     @Body() newUser: AdminRegisterRequest
   ): Promise<{ token: string }> {
-    if (newUser.role !== Role.Admin)
-      throw new UnauthorizedException({
-        message: 'Use /register to register a user',
-      });
-
     const registerRequest: RegisterRequest = {
-      bodyWeight: -1,
       ...newUser,
+      bodyWeight: -1,
+      role:       Role.Admin,
     };
 
     return this.authService.register(registerRequest);

@@ -197,9 +197,9 @@ export class UserService {
     });
   }
 
-  async getUserByToken(authHeader: string): Promise<User | null> {
+  async getUserByToken(bearerToken: string): Promise<User | null> {
     try {
-      const token = authHeader.split(' ')[1];
+      const token = bearerToken.replace('Bearer ', '');
       const payload = await admin.auth().verifyIdToken(token);
 
       if (!payload || !payload.email) return null;

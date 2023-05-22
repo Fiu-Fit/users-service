@@ -1,5 +1,4 @@
-import { Role } from '@prisma/client';
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class AdminRegisterRequest {
   @IsString()
@@ -17,7 +16,4 @@ export class AdminRegisterRequest {
   @IsString()
   @IsNotEmpty()
   password: string;
-
-  @IsEnum(Role)
-  role: Role;
 }
