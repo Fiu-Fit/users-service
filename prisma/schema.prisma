@@ -11,14 +11,19 @@ datasource db {
 }
 
 model User {
-  id         Int    @id @default(autoincrement())
-  uid        String @unique
-  email      String @unique
-  firstName  String @map("first_name")
-  lastName   String @map("last_name")
-  bodyWeight Float
-  favoriteWorkouts String[] @default([])
-  role       Role
+  id                Int        @id @default(autoincrement())
+  uid               String     @unique
+  email             String     @unique
+  firstName         String     @map("first_name")
+  lastName          String     @map("last_name")
+  bodyWeight        Float      @map("body_weight")
+  favoriteWorkouts  String[]   @default([]) @map("favorite_workouts")
+  role              Role
+  blocked           Boolean    @default(false)
+  federatedIdentity Boolean    @default(false) @map("federated_identity")
+  passwordResets    DateTime[] @default([]) @map("password_resets")
+  lastLogin         DateTime   @default(now()) @map("last_login")
+  createdAt         DateTime   @default(now()) @map("created_at")
 }
 
 enum Role {

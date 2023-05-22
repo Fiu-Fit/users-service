@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Headers,
   Post,
   UnauthorizedException,
   UseGuards,
@@ -8,7 +9,7 @@ import {
 import { Role } from '@prisma/client';
 import { AdminGuard } from './admin.guard';
 import { AuthService } from './auth.service';
-import { LoginRequest, RegisterRequest } from './dto';
+import { AdminRegisterRequest, LoginRequest, RegisterRequest } from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -30,8 +31,20 @@ export class AuthController {
 
   @UseGuards(AdminGuard)
   @Post('admin/register')
-  adminRegister(@Body() newUser: RegisterRequest): Promise<{ token: string }> {
-    return this.authService.register(newUser);
+  adminRegister(
+    @Body() newUser: AdminRegisterRequest
+  ): Promise<{ token: string }> {
+    if (newUser.role !== Role.Admin)
+      throw new UnauthorizedException({
+        message: 'Use /register to register a user',
+      });
+
+    const registerRequest: RegisterRequest = {
+      bodyWeight: -1,
+      ...newUser,
+    };
+
+    return this.authService.register(registerRequest);
   }
 
   @Post('admin/login')
@@ -42,5 +55,10 @@ export class AuthController {
   @Post('logout')
   logout() {
     return this.authService.logout();
+  }
+
+  @Post('password-reset')
+  passwordReset(@Headers('Authorization') bearerToken: string) {
+    return this.authService.addPasswordReset(bearerToken);
   }
 }
