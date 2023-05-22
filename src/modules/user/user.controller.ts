@@ -120,10 +120,10 @@ export class UserController {
 
   @Post(':id/follow')
   followUser(
-    @Param('id', ParseIntPipe) id: number,
-    @Body('followerId') followerId: number
+    @Param('id', ParseIntPipe) userIdWhoFollows: number,
+    @Body('followerId') userIdToFollow: number
   ): Promise<Follower> {
-    return this.followerService.followUser(id, followerId);
+    return this.followerService.followUser(userIdToFollow, userIdWhoFollows);
   }
 
   @Get(':id/followers')
