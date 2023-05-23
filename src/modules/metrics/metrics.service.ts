@@ -7,7 +7,7 @@ import { GetAuthMetricsQueryDTO } from './dto';
 export class MetricsService {
   constructor(private prismaService: PrismaService) {}
 
-  async findAndCountUsers(where: any, year: number): Promise<number[]> {
+  async countUsersRegisterByMonth(where: any, year: number): Promise<number[]> {
     const result: number[] = [];
     await this.prismaService.$transaction(async prisma => {
       for (let i = 0; i < 12; i++) {
@@ -28,7 +28,7 @@ export class MetricsService {
     return result;
   }
 
-  async findAndCountUserActivities(
+  async countUserActivitiesByMonth(
     where: any,
     year: number
   ): Promise<number[]> {
@@ -58,7 +58,7 @@ export class MetricsService {
       blocked:           filter.blocked,
     };
 
-    return this.findAndCountUsers(where, filter.year);
+    return this.countUsersRegisterByMonth(where, filter.year);
   }
 
   getLoginMetrics(filter: GetAuthMetricsQueryDTO): Promise<number[]> {
@@ -70,7 +70,7 @@ export class MetricsService {
       },
     };
 
-    return this.findAndCountUserActivities(where, filter.year);
+    return this.countUserActivitiesByMonth(where, filter.year);
   }
 
   getPasswordResetMetrics(filter: GetAuthMetricsQueryDTO): Promise<number[]> {
@@ -82,6 +82,6 @@ export class MetricsService {
       },
     };
 
-    return this.findAndCountUserActivities(where, filter.year);
+    return this.countUserActivitiesByMonth(where, filter.year);
   }
 }
