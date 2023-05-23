@@ -4,7 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Role } from '@prisma/client';
+import { Role, UserActivity, UserActivityType } from '@prisma/client';
 import {
   UserCredential,
   createUserWithEmailAndPassword,
@@ -15,7 +15,7 @@ import {
 import { firebaseApp } from '../../firebase/firebase';
 import { PrismaService } from '../../prisma.service';
 import { UserService } from '../user/user.service';
-import { LoginRequest, RegisterRequest } from './dto';
+import { AdminRegisterRequest, LoginRequest, RegisterRequest } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +24,9 @@ export class AuthService {
     private userService: UserService
   ) {}
 
-  async register(newUser: RegisterRequest): Promise<{ token: string }> {
+  async register(
+    newUser: RegisterRequest | AdminRegisterRequest
+  ): Promise<{ token: string }> {
     const auth = getAuth(firebaseApp);
     let userCredentials: UserCredential;
     let token: string;
@@ -65,62 +67,31 @@ export class AuthService {
   }
 
   async login(loginInfo: LoginRequest): Promise<{ token: string }> {
-    const auth = getAuth(firebaseApp);
-    let userCredentials: UserCredential;
-    let token: string;
-    try {
-      userCredentials = await signInWithEmailAndPassword(
-        auth,
-        loginInfo.email,
-        loginInfo.password
-      );
-      userCredentials.user.uid;
-      token = await userCredentials.user.getIdToken();
-    } catch (error) {
-      throw new BadRequestException({
-        message: 'Invalid Credentials',
-      });
-    }
-
-    const user = await this.prismaService.user.findUnique({
-      where: {
-        uid: userCredentials.user.uid,
-      },
-    });
+    const token = await this.getUserToken(loginInfo);
+    const user = await this.userService.getUserByToken(token);
 
     if (!user || user.role === Role.Admin) {
-      throw new BadRequestException({
+      throw new UnauthorizedException({
         message: 'Invalid Credentials',
       });
     }
+
+    await this.updateLoginTime(user.id);
 
     return { token };
   }
 
   async adminLogin(loginInfo: LoginRequest): Promise<{ token: string }> {
-    const auth = getAuth(firebaseApp);
-    let userCredentials: UserCredential;
-    let token: string;
-    try {
-      userCredentials = await signInWithEmailAndPassword(
-        auth,
-        loginInfo.email,
-        loginInfo.password
-      );
-      token = await userCredentials.user.getIdToken();
-    } catch (error) {
-      throw new BadRequestException({
-        message: 'Invalid Credentials',
-      });
-    }
-
-    const user = await this.userService.getUserByEmail(loginInfo.email);
+    const token = await this.getUserToken(loginInfo);
+    const user = await this.userService.getUserByToken(token);
 
     if (!user || user.role !== Role.Admin) {
       throw new UnauthorizedException({
         message: 'Invalid credentials: You are not an admin',
       });
     }
+
+    await this.updateLoginTime(user.id);
 
     return { token };
   }
@@ -134,5 +105,48 @@ export class AuthService {
         message: `Error while logging out: ${error}`,
       });
     }
+  }
+
+  async updateLoginTime(userId: number): Promise<void> {
+    await this.prismaService.userActivity.create({
+      data: {
+        userId,
+        type:      UserActivityType.Login,
+        timestamp: new Date(),
+      },
+    });
+  }
+
+  async getUserToken(loginInfo: LoginRequest): Promise<string> {
+    const auth = getAuth(firebaseApp);
+    let userCredentials: UserCredential;
+    let token: string;
+    try {
+      userCredentials = await signInWithEmailAndPassword(
+        auth,
+        loginInfo.email,
+        loginInfo.password
+      );
+      token = await userCredentials.user.getIdToken();
+    } catch (error) {
+      throw new BadRequestException({
+        message: 'Invalid Credentials',
+      });
+    }
+
+    return token;
+  }
+
+  async addPasswordReset(token: string): Promise<UserActivity> {
+    const user = await this.userService.getUserByToken(token);
+    if (!user) throw new UnauthorizedException('Invalid token');
+
+    return this.prismaService.userActivity.create({
+      data: {
+        userId:    user.id,
+        type:      UserActivityType.PasswordReset,
+        timestamp: new Date(),
+      },
+    });
   }
 }

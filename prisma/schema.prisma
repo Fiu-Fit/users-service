@@ -11,15 +11,19 @@ datasource db {
 }
 
 model User {
-  id         Int    @id @default(autoincrement())
-  uid        String @unique
-  email      String @unique
-  firstName  String @map("first_name")
-  lastName   String @map("last_name")
-  bodyWeight Float
-  favoriteWorkouts String[] @default([]) @map("favorite_workouts")
-  followers  Follower[]
-  role       Role
+  id                Int    @id @default(autoincrement())
+  uid               String @unique
+  email             String @unique
+  firstName         String @map("first_name")
+  lastName          String @map("last_name")
+  bodyWeight        Float
+  favoriteWorkouts  String[] @default([]) @map("favorite_workouts")
+  followers         Follower[]
+  role              Role
+  blocked           Boolean        @default(false)
+  federatedIdentity Boolean        @default(false) @map("federated_identity")
+  userActivity      UserActivity[]
+  createdAt         DateTime       @default(now()) @map("created_at")
 }
 
 enum Role {
@@ -36,4 +40,17 @@ model Follower {
   follwedAt DateTime @default(now()) @map("followed_at")
 
   @@unique(fields: [userId, followerId], name: "followerFollowingId")
+}
+
+model UserActivity {
+  id        Int              @id @default(autoincrement())
+  type      UserActivityType
+  timestamp DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id])
+  userId    Int             @map("user_id")
+}
+
+enum UserActivityType {
+  Login
+  PasswordReset
 }
