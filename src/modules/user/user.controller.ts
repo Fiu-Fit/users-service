@@ -13,7 +13,7 @@ import {
   Query,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Follower, Role, User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { FollowerService } from '../followers/follower.service';
 import { GetUsersQueryDTO } from './dto';
 import { UserDTO } from './dto/user.dto';
@@ -116,31 +116,5 @@ export class UserController {
     @Param('workoutId') workoutId: string
   ): Promise<User> {
     return this.userService.removeFavoriteWorkout(id, workoutId);
-  }
-
-  @Post(':id/follow')
-  followUser(
-    @Param('id', ParseIntPipe) userIdWhoFollows: number,
-    @Body('followerId') userIdToFollow: number
-  ): Promise<Follower> {
-    return this.followerService.followUser(userIdToFollow, userIdWhoFollows);
-  }
-
-  @Get(':id/followers')
-  getFollowers(@Param('id', ParseIntPipe) id: number): Promise<Page<User>> {
-    return this.followerService.getUserFollowers(id);
-  }
-
-  @Get(':id/following')
-  getFollowing(@Param('id', ParseIntPipe) id: number): Promise<Page<User>> {
-    return this.followerService.getUserFollowings(id);
-  }
-
-  @Delete(':id/unfollow/:followerId')
-  unfollowUser(
-    @Param('id', ParseIntPipe) id: number,
-    @Param('followerId', ParseIntPipe) followerId: number
-  ): Promise<Follower> {
-    return this.followerService.unfollowUser(id, followerId);
   }
 }
