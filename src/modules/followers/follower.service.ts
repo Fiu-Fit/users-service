@@ -25,10 +25,7 @@ export class FollowerService {
       where:   { id },
       include: {
         followers: {
-          select: {
-            followerId: true,
-            follwedAt:  true,
-          },
+          select: { followerId: true },
         },
       },
     });
