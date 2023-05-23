@@ -190,13 +190,16 @@ export class UserService {
 
   createUser(user: UserDTO): Promise<User> {
     return this.prismaService.user.create({
-      data: user,
+      data: {
+        ...user,
+        federatedIdentity: true,
+      },
     });
   }
 
-  async getUserByToken(authHeader: string): Promise<User | null> {
+  async getUserByToken(bearerToken: string): Promise<User | null> {
     try {
-      const token = authHeader.split(' ')[1];
+      const token = bearerToken.replace('Bearer ', '');
       const payload = await admin.auth().verifyIdToken(token);
 
       if (!payload || !payload.email) return null;
