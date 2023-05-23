@@ -7,11 +7,18 @@ import { GetAuthMetricsQueryDTO } from './dto';
 export class MetricsService {
   constructor(private prismaService: PrismaService) {}
 
-  async countUsersRegisterByMonth(where: any, year: number): Promise<number[]> {
+  async countByMonth(
+    where: any,
+    modelName: keyof PrismaService,
+    year: number
+  ): Promise<number[]> {
     const result: number[] = [];
+    const model = this.prismaService[modelName] as any;
+
+    if (!model || model.count == undefined) throw new Error('Invalid model');
 
     for (let i = 0; i < 12; i++) {
-      const count = await this.prismaService.user.count({
+      const count = await model.count({
         where: {
           ...where,
           createdAt: {
@@ -20,30 +27,6 @@ export class MetricsService {
           },
         },
       });
-
-      result.push(count);
-    }
-
-    return result;
-  }
-
-  async countUserActivitiesByMonth(
-    where: any,
-    year: number
-  ): Promise<number[]> {
-    const result: number[] = [];
-
-    for (let i = 0; i < 12; i++) {
-      const count = await this.prismaService.userActivity.count({
-        where: {
-          ...where,
-          timestamp: {
-            gte: new Date(year, i),
-            lt:  new Date(year, i + 1),
-          },
-        },
-      });
-
       result.push(count);
     }
 
@@ -56,7 +39,7 @@ export class MetricsService {
       blocked:           filter.blocked,
     };
 
-    return this.countUsersRegisterByMonth(where, filter.year);
+    return this.countByMonth(where, 'user', filter.year);
   }
 
   getLoginMetrics(filter: GetAuthMetricsQueryDTO): Promise<number[]> {
@@ -68,7 +51,7 @@ export class MetricsService {
       },
     };
 
-    return this.countUserActivitiesByMonth(where, filter.year);
+    return this.countByMonth(where, 'userActivity', filter.year);
   }
 
   getPasswordResetMetrics(filter: GetAuthMetricsQueryDTO): Promise<number[]> {
@@ -80,6 +63,6 @@ export class MetricsService {
       },
     };
 
-    return this.countUserActivitiesByMonth(where, filter.year);
+    return this.countByMonth(where, 'userActivity', filter.year);
   }
 }
