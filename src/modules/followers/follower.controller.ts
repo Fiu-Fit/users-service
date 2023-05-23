@@ -19,27 +19,31 @@ export class FollowerController {
 
   @Post('follow')
   followUser(
-    @Query('id') id: number,
+    @Query('userId') userId: number,
     @Body('userIdToFollow') userIdToFollow: number
   ): Promise<Follower> {
-    return this.followerService.followUser(userIdToFollow, id);
+    return this.followerService.followUser(userIdToFollow, userId);
   }
 
   @Get('followers')
-  getFollowers(@Query('id', ParseIntPipe) id: number): Promise<Page<User>> {
-    return this.followerService.getUserFollowers(id);
+  getFollowers(
+    @Query('userId', ParseIntPipe) userId: number
+  ): Promise<Page<User>> {
+    return this.followerService.getUserFollowers(userId);
   }
 
   @Get('following')
-  getFollowing(@Query('id', ParseIntPipe) id: number): Promise<Page<User>> {
-    return this.followerService.getUserFollowings(id);
+  getFollowing(
+    @Query('userId', ParseIntPipe) userId: number
+  ): Promise<Page<User>> {
+    return this.followerService.getUserFollowings(userId);
   }
 
   @Delete('unfollow')
   unfollowUser(
-    @Query('id', ParseIntPipe) id: number,
+    @Query('userId', ParseIntPipe) userId: number,
     @Query('followerId', ParseIntPipe) followerId: number
   ): Promise<Follower> {
-    return this.followerService.unfollowUser(id, followerId);
+    return this.followerService.unfollowUser(userId, followerId);
   }
 }
