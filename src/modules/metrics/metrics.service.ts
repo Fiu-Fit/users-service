@@ -1,6 +1,5 @@
-import { Page } from '@fiu-fit/common';
 import { Injectable } from '@nestjs/common';
-import { User, UserActivityType } from '@prisma/client';
+import { UserActivityType } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 import { GetAuthMetricsQueryDTO } from './dto';
 
@@ -8,75 +7,81 @@ import { GetAuthMetricsQueryDTO } from './dto';
 export class MetricsService {
   constructor(private prismaService: PrismaService) {}
 
-  async findAndCountUsers(where: any): Promise<Page<any>> {
-    return {
-      rows: await this.prismaService.user.findMany({
-        where,
-        select: {
-          id:                true,
-          firstName:         true,
-          lastName:          true,
-          email:             true,
-          federatedIdentity: true,
-          blocked:           true,
-          createdAt:         true,
-        },
-      }),
-      count: await this.prismaService.user.count({ where }),
-    };
+  async findAndCountUsers(where: any, year: number): Promise<number[]> {
+    const result: number[] = [];
+    await this.prismaService.$transaction(async prisma => {
+      for (let i = 0; i < 12; i++) {
+        const count = await prisma.user.count({
+          where: {
+            ...where,
+            createdAt: {
+              gte: new Date(year, i),
+              lt:  new Date(year, i + 1),
+            },
+          },
+        });
+
+        result.push(count);
+      }
+    });
+
+    return result;
   }
 
-  async findAndCountUserActivities(where: any): Promise<Page<any>> {
-    return {
-      rows: await this.prismaService.userActivity.findMany({
-        where,
-      }),
-      count: await this.prismaService.userActivity.count({ where }),
-    };
+  async findAndCountUserActivities(
+    where: any,
+    year: number
+  ): Promise<number[]> {
+    const result: number[] = [];
+    await this.prismaService.$transaction(async prisma => {
+      for (let i = 0; i < 12; i++) {
+        const count = await prisma.userActivity.count({
+          where: {
+            ...where,
+            timestamp: {
+              gte: new Date(year, i),
+              lt:  new Date(year, i + 1),
+            },
+          },
+        });
+
+        result.push(count);
+      }
+    });
+
+    return result;
   }
 
-  getRegisterMetrics(filter: GetAuthMetricsQueryDTO): Promise<Page<User>> {
+  getRegisterMetrics(filter: GetAuthMetricsQueryDTO): Promise<number[]> {
     const where = {
       federatedIdentity: filter.federatedIdentity,
       blocked:           filter.blocked,
-      createdAt:         {
-        gte: filter.start,
-        lte: filter.end,
-      },
     };
 
-    return this.findAndCountUsers(where);
+    return this.findAndCountUsers(where, filter.year);
   }
 
-  getLoginMetrics(filter: GetAuthMetricsQueryDTO): Promise<Page<User>> {
+  getLoginMetrics(filter: GetAuthMetricsQueryDTO): Promise<number[]> {
     const where = {
-      type:      UserActivityType.Login,
-      timestamp: {
-        gte: filter.start,
-        lte: filter.end,
-      },
+      type: UserActivityType.Login,
       user: {
         federatedIdentity: filter.federatedIdentity,
         blocked:           filter.blocked,
       },
     };
 
-    return this.findAndCountUserActivities(where);
+    return this.findAndCountUserActivities(where, filter.year);
   }
 
-  getPasswordResetMetrics(filter: GetAuthMetricsQueryDTO): Promise<Page<User>> {
+  getPasswordResetMetrics(filter: GetAuthMetricsQueryDTO): Promise<number[]> {
     const where = {
-      type:      UserActivityType.PasswordReset,
-      timestamp: {
-        gte: filter.start,
-        lte: filter.end,
-      },
+      type: UserActivityType.PasswordReset,
       user: {
         federatedIdentity: filter.federatedIdentity,
         blocked:           filter.blocked,
       },
     };
 
-    return this.findAndCountUserActivities(where);
+    return this.findAndCountUserActivities(where, filter.year);
   }
 }
