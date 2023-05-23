@@ -1,13 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the column `favoriteWorkouts` on the `User` table. All the data in the column will be lost.
-
-*/
--- AlterTable
-ALTER TABLE "User" DROP COLUMN "favoriteWorkouts",
-ADD COLUMN     "favorite_workouts" TEXT[] DEFAULT ARRAY[]::TEXT[];
-
 -- CreateTable
 CREATE TABLE "Follower" (
     "id" SERIAL NOT NULL,
