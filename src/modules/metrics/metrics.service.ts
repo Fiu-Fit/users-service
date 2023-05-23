@@ -9,21 +9,20 @@ export class MetricsService {
 
   async countUsersRegisterByMonth(where: any, year: number): Promise<number[]> {
     const result: number[] = [];
-    await this.prismaService.$transaction(async prisma => {
-      for (let i = 0; i < 12; i++) {
-        const count = await prisma.user.count({
-          where: {
-            ...where,
-            createdAt: {
-              gte: new Date(year, i),
-              lt:  new Date(year, i + 1),
-            },
-          },
-        });
 
-        result.push(count);
-      }
-    });
+    for (let i = 0; i < 12; i++) {
+      const count = await this.prismaService.user.count({
+        where: {
+          ...where,
+          createdAt: {
+            gte: new Date(year, i),
+            lt:  new Date(year, i + 1),
+          },
+        },
+      });
+
+      result.push(count);
+    }
 
     return result;
   }
@@ -33,21 +32,20 @@ export class MetricsService {
     year: number
   ): Promise<number[]> {
     const result: number[] = [];
-    await this.prismaService.$transaction(async prisma => {
-      for (let i = 0; i < 12; i++) {
-        const count = await prisma.userActivity.count({
-          where: {
-            ...where,
-            timestamp: {
-              gte: new Date(year, i),
-              lt:  new Date(year, i + 1),
-            },
-          },
-        });
 
-        result.push(count);
-      }
-    });
+    for (let i = 0; i < 12; i++) {
+      const count = await this.prismaService.userActivity.count({
+        where: {
+          ...where,
+          timestamp: {
+            gte: new Date(year, i),
+            lt:  new Date(year, i + 1),
+          },
+        },
+      });
+
+      result.push(count);
+    }
 
     return result;
   }
